@@ -7,6 +7,7 @@ let package = Package(
        .macOS(.v13)
     ],
     dependencies: [
+        .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", exact: "4.9.2"),
         .package(
             url: "https://github.com/vapor/vapor.git",
             from: "4.121.4"
@@ -37,6 +38,7 @@ let package = Package(
         .executableTarget(
             name: "WakTrainerServer",
             dependencies: [
+                .product(name: "VaporToOpenAPI", package: "VaporToOpenAPI"),
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOPosix", package: "swift-nio"),

@@ -1,0 +1,3530 @@
+{
+  "components": {
+    "schemas": {
+      "APIErrorCode": {
+        "description": "Complete code catalog. Endpoint responses list reachable codes. FORBIDDEN and EMAIL_VERIFICATION_REQUIRED are not currently enforced by public handlers. HTTP_ERROR is the fallback for otherwise unmapped Abort statuses.",
+        "enum": [
+          "INVALID_REQUEST",
+          "VALIDATION_FAILED",
+          "INVALID_CREDENTIALS",
+          "CURRENT_PASSWORD_INVALID",
+          "AUTHENTICATION_REQUIRED",
+          "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+          "SESSION_INVALID",
+          "REFRESH_TOKEN_REJECTED",
+          "PASSWORD_RESET_TOKEN_INVALID",
+          "EMAIL_VERIFICATION_TOKEN_INVALID",
+          "EMAIL_CHANGE_TOKEN_INVALID",
+          "EMAIL_ALREADY_EXISTS",
+          "NOT_FOUND",
+          "RATE_LIMITED",
+          "PAYLOAD_TOO_LARGE",
+          "UNSUPPORTED_MEDIA_TYPE",
+          "FORBIDDEN",
+          "EMAIL_VERIFICATION_REQUIRED",
+          "INTERNAL_ERROR",
+          "EMAIL_DELIVERY_FAILED",
+          "HTTP_ERROR"
+        ],
+        "type": "string",
+        "x-default-status": {
+          "ACCESS_TOKEN_INVALID_OR_EXPIRED": 401,
+          "AUTHENTICATION_REQUIRED": 401,
+          "CURRENT_PASSWORD_INVALID": 401,
+          "EMAIL_ALREADY_EXISTS": 409,
+          "EMAIL_CHANGE_TOKEN_INVALID": 400,
+          "EMAIL_DELIVERY_FAILED": 502,
+          "EMAIL_VERIFICATION_REQUIRED": 403,
+          "EMAIL_VERIFICATION_TOKEN_INVALID": 400,
+          "FORBIDDEN": 403,
+          "HTTP_ERROR": 500,
+          "INTERNAL_ERROR": 500,
+          "INVALID_CREDENTIALS": 401,
+          "INVALID_REQUEST": 400,
+          "NOT_FOUND": 404,
+          "PASSWORD_RESET_TOKEN_INVALID": 400,
+          "PAYLOAD_TOO_LARGE": 413,
+          "RATE_LIMITED": 429,
+          "REFRESH_TOKEN_REJECTED": 401,
+          "SESSION_INVALID": 401,
+          "UNSUPPORTED_MEDIA_TYPE": 415,
+          "VALIDATION_FAILED": 400
+        }
+      },
+      "APIErrorResponseDTO": {
+        "description": "status equals HTTP status; reason equals message (legacy compatibility). details is omitted when unavailable. No diagnostic or credential values are returned.",
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/APIErrorCode"
+          },
+          "details": {
+            "items": {
+              "$ref": "#/components/schemas/APIValidationDetail"
+            },
+            "type": "array"
+          },
+          "error": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "error",
+          "status",
+          "code",
+          "message",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "APIValidationDetail": {
+        "properties": {
+          "code": {
+            "enum": [
+              "INVALID_FORMAT",
+              "MUST_DIFFER"
+            ],
+            "type": "string"
+          },
+          "field": {
+            "enum": [
+              "email",
+              "newEmail",
+              "sessionID"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "code"
+        ],
+        "type": "object"
+      },
+      "AuthRequestDTO": {
+        "properties": {
+          "email": {
+            "description": "At most 254 UTF-8 bytes; must contain @ and a dot. Compared and stored exactly as supplied; no normalization or RFC email validator.",
+            "type": "string"
+          },
+          "password": {
+            "description": "7–20 Swift Characters (extended grapheme clusters), at most 72 UTF-8 bytes. JSON Schema length cannot express this exactly.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object"
+      },
+      "ChangePasswordRequestDTO": {
+        "properties": {
+          "currentPassword": {
+            "description": "Nonempty, at most 72 UTF-8 bytes; must match current password.",
+            "type": "string"
+          },
+          "newPassword": {
+            "description": "7–20 Swift Characters (extended grapheme clusters), at most 72 UTF-8 bytes. JSON Schema length cannot express this exactly.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object"
+      },
+      "ConfirmEmailChangeRequestDTO": {
+        "properties": {
+          "token": {
+            "description": "Opaque credential; submitted tokens are checked for exactly 64 UTF-8 bytes. Never log or place in examples.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "ForgotPasswordRequestDTO": {
+        "properties": {
+          "email": {
+            "description": "At most 254 UTF-8 bytes; must contain @ and a dot. Compared and stored exactly as supplied; no normalization or RFC email validator.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "ManagedSessionResponseDTO": {
+        "description": "id is the stable management UUID. createdAt is current row creation; startedAt is login start (legacy fallback may differ); lastRefreshedAt records successful refresh only. ISO-8601 dates; missing optional fields are omitted.",
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deviceName": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "isCurrent": {
+            "type": "boolean"
+          },
+          "lastRefreshedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "expiresAt",
+          "isCurrent"
+        ],
+        "type": "object"
+      },
+      "MessageResponseDTO": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "RefreshRequestDTO": {
+        "properties": {
+          "refreshToken": {
+            "description": "Opaque credential; submitted tokens are checked for exactly 64 UTF-8 bytes. Never log or place in examples.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ],
+        "type": "object"
+      },
+      "RequestEmailChangeRequestDTO": {
+        "properties": {
+          "currentPassword": {
+            "description": "Nonempty, at most 72 UTF-8 bytes; must match current password.",
+            "type": "string"
+          },
+          "newEmail": {
+            "description": "At most 254 UTF-8 bytes; must contain @ and a dot. Compared and stored exactly as supplied; no normalization or RFC email validator.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newEmail"
+        ],
+        "type": "object"
+      },
+      "ResendVerificationEmailRequestDTO": {
+        "properties": {
+          "email": {
+            "description": "At most 254 UTF-8 bytes; must contain @ and a dot. Compared and stored exactly as supplied; no normalization or RFC email validator.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "ResetPasswordRequestDTO": {
+        "properties": {
+          "newPassword": {
+            "description": "7–20 Swift Characters (extended grapheme clusters), at most 72 UTF-8 bytes. JSON Schema length cannot express this exactly.",
+            "type": "string"
+          },
+          "token": {
+            "description": "Opaque credential; submitted tokens are checked for exactly 64 UTF-8 bytes. Never log or place in examples.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ],
+        "type": "object"
+      },
+      "SessionListResponseDTO": {
+        "properties": {
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/ManagedSessionResponseDTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sessions"
+        ],
+        "type": "object"
+      },
+      "SessionResponseDTO": {
+        "description": "Both tokens are currently issued on success. refreshToken remains optional in the Swift DTO. Refresh lifetime is approximately 30 days.",
+        "properties": {
+          "accessToken": {
+            "description": "Bearer JWT, approximately 15 minutes; requires a valid backing session.",
+            "type": "string"
+          },
+          "refreshToken": {
+            "description": "Opaque credential; submitted tokens are checked for exactly 64 UTF-8 bytes. Never log or place in examples.",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponseDTO"
+          }
+        },
+        "required": [
+          "user",
+          "accessToken"
+        ],
+        "type": "object"
+      },
+      "UserResponseDTO": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "isEmailVerified": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "isEmailVerified"
+        ],
+        "type": "object"
+      },
+      "VerifyEmailRequestDTO": {
+        "properties": {
+          "token": {
+            "description": "Opaque credential; submitted tokens are checked for exactly 64 UTF-8 bytes. Never log or place in examples.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "description": "JWT sub, exp and sid are validated together with the active database session. Email verification is not required for current protected routes.",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Contract baseline before AuthenticationServerKit extraction. Generated without running the server. JSON is the primary client format; current Vapor default form and JSON API decoders are also accepted. No query parameters are consumed. Unknown paths/methods return 404 NOT_FOUND using APIErrorResponseDTO. Infrastructure/proxy responses are outside this application contract.",
+    "title": "WakTrainerServer public API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/auth/change-password": {
+      "post": {
+        "description": "Requires the current password and a different new password. Revokes all sessions and cancels pending email changes.",
+        "operationId": "changePassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST",
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST, VALIDATION_FAILED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "CURRENT_PASSWORD_INVALID",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, CURRENT_PASSWORD_INVALID, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change password"
+      }
+    },
+    "/auth/confirm-email-change": {
+      "post": {
+        "description": "Consumes a one-use token valid for 30 minutes belonging to the authenticated user. Marks new email verified; retains only the confirming session and removes pending verification/reset tokens.",
+        "operationId": "confirmEmailChange",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailChangeRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailChangeRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailChangeRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailChangeRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EMAIL_CHANGE_TOKEN_INVALID",
+                            "INVALID_REQUEST"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "EMAIL_CHANGE_TOKEN_INVALID, INVALID_REQUEST"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EMAIL_ALREADY_EXISTS"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            409
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "EMAIL_ALREADY_EXISTS"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Confirm email change"
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "description": "Unknown accounts and throttled requests return the same success message. Delivery is not guaranteed.",
+        "operationId": "forgotPassword",
+        "parameters": [
+          {
+            "description": "Optional untrusted abuse signal, never authentication. One header; trimmed nonempty value at most 128 UTF-8 bytes. Invalid values are ignored.",
+            "in": "header",
+            "name": "X-Client-ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST",
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST, VALIDATION_FAILED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EMAIL_DELIVERY_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            502
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "EMAIL_DELIVERY_FAILED"
+          }
+        },
+        "security": [],
+        "summary": "Request password reset"
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "description": "Checks IP and email quotas before issuing a session. Unverified users may log in.",
+        "operationId": "login",
+        "parameters": [
+          {
+            "description": "One header, at most 128 UTF-8 bytes, no control characters. Trimmed; invalid or empty values are ignored.",
+            "in": "header",
+            "name": "X-Device-Name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST",
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST, VALIDATION_FAILED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_CREDENTIALS",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_CREDENTIALS, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "RATE_LIMITED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            429
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "RATE_LIMITED",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until retry (positive integer).",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [],
+        "summary": "Log in"
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "description": "Revokes the current access and refresh tokens.",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Log out current session"
+      }
+    },
+    "/auth/logout-all": {
+      "post": {
+        "description": "Revokes every session including the calling session.",
+        "operationId": "logoutAll",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Log out all sessions"
+      }
+    },
+    "/auth/logout-other-sessions": {
+      "post": {
+        "description": "Keeps the calling session; revokes all others.",
+        "operationId": "logoutOtherSessions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Log out other sessions"
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "description": "Returns current email and verification state.",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get current user"
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "description": "Consumes the refresh token once; replaces both tokens and invalidates the previous access token. Stable management ID and device name survive rotation.",
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "REFRESH_TOKEN_REJECTED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "REFRESH_TOKEN_REJECTED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [],
+        "summary": "Rotate session tokens"
+      }
+    },
+    "/auth/request-email-change": {
+      "post": {
+        "description": "Requires current password and a different unused email. Replaces the pending token; current address is unchanged. Throttling returns 429 without Retry-After.",
+        "operationId": "requestEmailChange",
+        "parameters": [
+          {
+            "description": "Optional untrusted abuse signal, never authentication. One header; trimmed nonempty value at most 128 UTF-8 bytes. Invalid values are ignored.",
+            "in": "header",
+            "name": "X-Client-ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEmailChangeRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEmailChangeRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEmailChangeRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEmailChangeRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST",
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST, VALIDATION_FAILED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "CURRENT_PASSWORD_INVALID",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, CURRENT_PASSWORD_INVALID, SESSION_INVALID"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EMAIL_ALREADY_EXISTS"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            409
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "EMAIL_ALREADY_EXISTS"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "RATE_LIMITED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            429
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EMAIL_DELIVERY_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            502
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "EMAIL_DELIVERY_FAILED"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Request email change"
+      }
+    },
+    "/auth/resend-verification-email": {
+      "post": {
+        "description": "Replaces the previous verification token. Unknown, verified, throttled accounts and delivery failures return the same success message.",
+        "operationId": "resendVerificationEmail",
+        "parameters": [
+          {
+            "description": "Optional untrusted abuse signal, never authentication. One header; trimmed nonempty value at most 128 UTF-8 bytes. Invalid values are ignored.",
+            "in": "header",
+            "name": "X-Client-ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationEmailRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationEmailRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationEmailRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationEmailRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST",
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST, VALIDATION_FAILED"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [],
+        "summary": "Resend verification email"
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "description": "Consumes a one-use token valid for 30 minutes, revokes all sessions and cancels pending email changes.",
+        "operationId": "resetPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST",
+                            "PASSWORD_RESET_TOKEN_INVALID",
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST, PASSWORD_RESET_TOKEN_INVALID, VALIDATION_FAILED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [],
+        "summary": "Reset password"
+      }
+    },
+    "/auth/sessions": {
+      "get": {
+        "description": "Returns only owned unexpired sessions, ordered by createdAt descending then row ID ascending. Optional legacy fields are omitted.",
+        "operationId": "sessions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionListResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List active sessions"
+      }
+    },
+    "/auth/sessions/{sessionID}": {
+      "delete": {
+        "description": "Uses the stable management ID, not JWT sid. Current session may be revoked. Foreign and missing IDs both return 404.",
+        "operationId": "revokeSession",
+        "parameters": [
+          {
+            "description": "Stable management ID returned by the session list.",
+            "in": "path",
+            "name": "sessionID",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "VALIDATION_FAILED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "NOT_FOUND"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            404
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "NOT_FOUND"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke a session"
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "description": "Creates a session and attempts verification email delivery. Delivery failures and email throttling do not fail signup.",
+        "operationId": "signUp",
+        "parameters": [
+          {
+            "description": "One header, at most 128 UTF-8 bytes, no control characters. Trimmed; invalid or empty values are ignored.",
+            "in": "header",
+            "name": "X-Device-Name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional untrusted abuse signal, never authentication. One header; trimmed nonempty value at most 128 UTF-8 bytes. Invalid values are ignored.",
+            "in": "header",
+            "name": "X-Client-ID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INVALID_REQUEST",
+                            "VALIDATION_FAILED"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INVALID_REQUEST, VALIDATION_FAILED"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EMAIL_ALREADY_EXISTS"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            409
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "EMAIL_ALREADY_EXISTS"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [],
+        "summary": "Create an account"
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "description": "Consumes a one-use token valid for 24 hours. Does not create or revoke sessions. Submit the link token in the body; there is no GET confirmation route.",
+        "operationId": "verifyEmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequestDTO"
+              }
+            },
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequestDTO"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequestDTO"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "EMAIL_VERIFICATION_TOKEN_INVALID",
+                            "INVALID_REQUEST"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            400
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "EMAIL_VERIFICATION_TOKEN_INVALID, INVALID_REQUEST"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "UNSUPPORTED_MEDIA_TYPE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            415
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "UNSUPPORTED_MEDIA_TYPE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [],
+        "summary": "Verify signup email"
+      }
+    },
+    "/auth/withdraw": {
+      "delete": {
+        "description": "Deletes the account and cascades deletion to its sessions.",
+        "operationId": "withdraw",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete account"
+      }
+    },
+    "/hello": {
+      "get": {
+        "description": "Returns the plain-text greeting.",
+        "operationId": "hello",
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIErrorResponseDTO"
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE (streamed request body exceeds collection limit)"
+          }
+        },
+        "security": [],
+        "summary": "Public greeting"
+      }
+    }
+  }
+}

@@ -221,7 +221,7 @@ Other successful mutation endpoints generally return:
 }
 ```
 
-Errors use Vapor's standard error response format.
+Errors use the standardized `APIErrorResponseDTO` contract described in [API errors](docs/api-errors.md).
 
 Some API messages are currently Korean. The README language does not affect API response language.
 
@@ -658,3 +658,21 @@ Errors retain `error` and `reason` and add `status`, `code`, `message`, and opti
 should branch on `code` and display `message`; `reason` is a compatibility field. Existing success
 responses and HTTP status policies are unchanged. Internal diagnostic details are never copied into
 error responses. See [API errors](docs/api-errors.md) for all codes, exceptions and client follow-up.
+
+## OpenAPI / API documentation automation
+
+The generated [OpenAPI 3.0.3 document](docs/openapi/openapi.json) records all current
+public APIs as the contract baseline before AuthenticationServerKit extraction.
+[Generation, validation and viewing instructions](docs/openapi/README.md) explain
+the DTO/route-derived schema and reviewed [operation metadata](docs/openapi/operations.json).
+
+```sh
+python3 -m venv /tmp/waktrainer-openapi
+/tmp/waktrainer-openapi/bin/pip install -r scripts/openapi-requirements.txt
+/tmp/waktrainer-openapi/bin/python scripts/openapi.py          # generate/update
+/tmp/waktrainer-openapi/bin/python scripts/openapi.py --check  # validate + detect drift
+swift test --filter OpenAPIContractTests                     # no database required
+```
+
+Open the JSON in a local OpenAPI viewer. No production Swagger endpoint is added.
+GitHub Actions validates the document, references and generated-file freshness.

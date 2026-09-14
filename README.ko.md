@@ -220,7 +220,7 @@ Signup, Login, Refresh는 동일한 session 구조를 반환합니다.
 }
 ```
 
-오류는 Vapor의 표준 error response 형식을 사용합니다.
+오류는 [API 에러 문서](docs/api-errors.md)의 표준화된 `APIErrorResponseDTO` 계약을 사용합니다.
 
 일부 API 메시지는 현재 한국어입니다. README 언어와 API 응답 언어는 별개입니다.
 
@@ -655,3 +655,22 @@ AUDIT_HASH_KEY
 신규 클라이언트는 `code`로 분기하고 `message`를 사용하세요. `reason`은 호환용 필드입니다.
 성공 응답과 기존 HTTP status 정책은 유지하며 내부 진단 정보는 에러 응답에 복사하지 않습니다.
 전체 코드·예외·클라이언트 후속 작업은 [API 에러 문서](docs/api-errors.md)를 참고하세요.
+
+## OpenAPI / API 문서 자동화
+
+현재 전체 public API의 기준 계약은 [OpenAPI 3.0.3 문서](docs/openapi/openapi.json)에
+있습니다. AuthenticationServerKit 추출 전에 비교할 baseline입니다.
+DTO/route 기반 생성 구조와 [endpoint metadata](docs/openapi/operations.json),
+제한사항은 [생성·검증·열람 가이드](docs/openapi/README.md)를 참고하세요.
+
+```sh
+python3 -m venv /tmp/waktrainer-openapi
+/tmp/waktrainer-openapi/bin/pip install -r scripts/openapi-requirements.txt
+/tmp/waktrainer-openapi/bin/python scripts/openapi.py          # 생성/갱신
+/tmp/waktrainer-openapi/bin/python scripts/openapi.py --check  # 표준·참조·최신 상태 검증
+swift test --filter OpenAPIContractTests                     # DB 불필요
+```
+
+JSON 파일을 로컬 OpenAPI viewer로 열어 확인합니다. 운영 Swagger endpoint는
+추가하지 않습니다. GitHub Actions에서 문서 유효성, reference 및 생성 결과의
+최신 상태를 검증합니다. 전체 테스트의 테스트 DB 준비 방법은 위 테스트 절을 따릅니다.

@@ -1,0 +1,125 @@
+{
+  "signUp": {
+    "summary": "Create an account",
+    "description": "Creates a session and attempts verification email delivery. Delivery failures and email throttling do not fail signup.",
+    "errors": [
+      "validationFailed",
+      "emailAlreadyExists"
+    ]
+  },
+  "login": {
+    "summary": "Log in",
+    "description": "Checks IP and email quotas before issuing a session. Unverified users may log in.",
+    "errors": [
+      "validationFailed",
+      "invalidCredentials",
+      "rateLimited",
+      "sessionInvalid"
+    ]
+  },
+  "me": {
+    "summary": "Get current user",
+    "description": "Returns current email and verification state.",
+    "errors": []
+  },
+  "refresh": {
+    "summary": "Rotate session tokens",
+    "description": "Consumes the refresh token once; replaces both tokens and invalidates the previous access token. Stable management ID and device name survive rotation.",
+    "errors": [
+      "refreshTokenRejected",
+      "sessionInvalid"
+    ]
+  },
+  "logout": {
+    "summary": "Log out current session",
+    "description": "Revokes the current access and refresh tokens.",
+    "errors": []
+  },
+  "withdraw": {
+    "summary": "Delete account",
+    "description": "Deletes the account and cascades deletion to its sessions.",
+    "errors": []
+  },
+  "forgotPassword": {
+    "summary": "Request password reset",
+    "description": "Unknown accounts and throttled requests return the same success message. Delivery is not guaranteed.",
+    "errors": [
+      "validationFailed",
+      "emailDeliveryFailed",
+      "sessionInvalid"
+    ]
+  },
+  "resetPassword": {
+    "summary": "Reset password",
+    "description": "Consumes a one-use token valid for 30 minutes, revokes all sessions and cancels pending email changes.",
+    "errors": [
+      "validationFailed",
+      "passwordResetTokenInvalid",
+      "sessionInvalid"
+    ]
+  },
+  "changePassword": {
+    "summary": "Change password",
+    "description": "Requires the current password and a different new password. Revokes all sessions and cancels pending email changes.",
+    "errors": [
+      "validationFailed",
+      "currentPasswordInvalid"
+    ]
+  },
+  "verifyEmail": {
+    "summary": "Verify signup email",
+    "description": "Consumes a one-use token valid for 24 hours. Does not create or revoke sessions. Submit the link token in the body; there is no GET confirmation route.",
+    "errors": [
+      "emailVerificationTokenInvalid"
+    ]
+  },
+  "resendVerificationEmail": {
+    "summary": "Resend verification email",
+    "description": "Replaces the previous verification token. Unknown, verified, throttled accounts and delivery failures return the same success message.",
+    "errors": [
+      "validationFailed"
+    ]
+  },
+  "requestEmailChange": {
+    "summary": "Request email change",
+    "description": "Requires current password and a different unused email. Replaces the pending token; current address is unchanged. Throttling returns 429 without Retry-After.",
+    "errors": [
+      "validationFailed",
+      "currentPasswordInvalid",
+      "emailAlreadyExists",
+      "rateLimited",
+      "emailDeliveryFailed"
+    ]
+  },
+  "confirmEmailChange": {
+    "summary": "Confirm email change",
+    "description": "Consumes a one-use token valid for 30 minutes belonging to the authenticated user. Marks new email verified; retains only the confirming session and removes pending verification/reset tokens.",
+    "errors": [
+      "emailChangeTokenInvalid",
+      "emailAlreadyExists"
+    ]
+  },
+  "sessions": {
+    "summary": "List active sessions",
+    "description": "Returns only owned unexpired sessions, ordered by createdAt descending then row ID ascending. Optional legacy fields are omitted.",
+    "errors": []
+  },
+  "revokeSession": {
+    "summary": "Revoke a session",
+    "description": "Uses the stable management ID, not JWT sid. Current session may be revoked. Foreign and missing IDs both return 404.",
+    "errors": [
+      "validationFailed",
+      "notFound"
+    ]
+  },
+  "logoutOtherSessions": {
+    "summary": "Log out other sessions",
+    "description": "Keeps the calling session; revokes all others.",
+    "errors": []
+  },
+  "logoutAll": {
+    "summary": "Log out all sessions",
+    "description": "Revokes every session including the calling session.",
+    "errors": []
+  }
+}
