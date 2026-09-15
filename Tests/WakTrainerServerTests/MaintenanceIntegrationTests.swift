@@ -1,3 +1,4 @@
+@testable import AuthenticationServerKit
 @testable import WakTrainerServer
 import Fluent
 import SQLKit
@@ -18,7 +19,7 @@ extension AuthIntegrationTests {
         let migration = IndexMaintenanceExpiryMigration()
         try await migration.prepare(on: app.db)
         try await migration.prepare(on: app.db)
-        for table in IndexMaintenanceExpiryMigration.tables {
+        for table in IndexMaintenanceExpiryMigrationImplementation.tables {
             let row = try #require(try await sql.raw("SELECT indisvalid FROM pg_index WHERE indexrelid = to_regclass(\(bind: table + "_maintenance_expiry_idx"))").first())
             #expect(try row.decode(column: "indisvalid", as: Bool.self))
         }

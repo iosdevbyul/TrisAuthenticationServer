@@ -1,21 +1,13 @@
+import AuthenticationServerKit
 import Fluent
 
+/// Host migration identity compatibility wrapper; retained through Phase C.
 struct AddEmailChangeMigration: AsyncMigration {
+    var name: String { "WakTrainerServer.AddEmailChangeMigration" }
     func prepare(on database: any Database) async throws {
-        // Additive: no rewrite/backfill or index build on the existing users table.
-        try await database.schema(EmailChangeToken.schema)
-            .id()
-            .field("user_id", .uuid, .required, .references(User.schema, .id, onDelete: .cascade))
-            .field("pending_email", .string, .required)
-            .field("token_hash", .string, .required)
-            .field("expires_at", .datetime, .required)
-            .field("created_at", .datetime)
-            .unique(on: "user_id")
-            .unique(on: "token_hash")
-            .create()
+        try await AuthenticationMigrations.make(.addEmailChangeMigration).prepare(on: database)
     }
-
     func revert(on database: any Database) async throws {
-        try await database.schema(EmailChangeToken.schema).delete()
+        try await AuthenticationMigrations.make(.addEmailChangeMigration).revert(on: database)
     }
 }

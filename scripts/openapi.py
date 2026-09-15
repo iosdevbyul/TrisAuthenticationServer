@@ -10,7 +10,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'Sources/WakTrainerServer'
+PACKAGE_SOURCE = ROOT / 'Packages/AuthenticationServerKit/Sources/AuthenticationServerKit'
 OUTPUT = ROOT / 'docs/openapi/openapi.json'
+
+def contract_source(path):
+    candidates = [root / path for root in (SOURCE, PACKAGE_SOURCE) if (root / path).is_file()]
+    assert len(candidates) == 1, f'Expected one contract source: {path}'
+    return candidates[0]
+
 
 
 def ref(name):
@@ -28,17 +35,18 @@ def generate():
             return dict(type='array', items=swift_type(value[1:-1]))
         return {'String': {'type': 'string'}, 'Bool': {'type': 'boolean'},
                 'Int': {'type': 'integer'}, 'Date': {'type': 'string', 'format': 'date-time'}}.get(value, ref(value))
-    for file in sorted((SOURCE / 'DTOs').glob('*.swift')):
-        source = re.sub(r'//[^\n]*', '', file.read_text())
+    for file in sorted([p for root in (SOURCE, PACKAGE_SOURCE) for p in (root / 'DTOs').glob('*.swift')]):
+        source = re.sub(r'\bpublic\s+', '', re.sub(r'//[^\n]*', '', file.read_text()))
         for name, body in re.findall(r'struct (\w+): Content \{(.*?)\n\}', source, re.S):
             if 'CodingKeys' in body or 'encode(' in body or 'decode(' in body:
                 raise ValueError(f'{name}: custom coding requires extractor support')
             fields = re.findall(r'^\s*let (\w+): ([\w\[\]]+)(\?)?\s*$', body, re.M)
             if len(fields) != len(re.findall(r'^\s*(?:let|var) ', body, re.M)):
                 raise ValueError(f'{name}: unsupported property declaration')
+            assert name not in schemas, f'Duplicate DTO: {name}'
             schemas[name] = object_schema({key: swift_type(kind) for key, kind, _ in fields},
                                           [key for key, _, optional in fields if not optional])
-    errors_source = (SOURCE / 'Errors/APIError.swift').read_text()
+    errors_source = contract_source('Errors/APIError.swift').read_text()
     codes = dict(re.findall(r'case (\w+) = "([A-Z_]+)"', errors_source))
     statuses = {}
     status_numbers = dict(badRequest=400, unauthorized=401, conflict=409, notFound=404,
@@ -52,7 +60,7 @@ def generate():
     schemas['APIErrorCode'] = dict(type='string', enum=list(codes.values()),
         description='Complete code catalog. Endpoint responses list reachable codes. FORBIDDEN and EMAIL_VERIFICATION_REQUIRED are not currently enforced by public handlers. HTTP_ERROR is the fallback for otherwise unmapped Abort statuses.',
         **{'x-default-status': {codes[k]: v for k, v in statuses.items()}})
-    detail_source = (SOURCE / 'DTOs/APIErrorResponseDTO.swift').read_text()
+    detail_source = contract_source('DTOs/APIErrorResponseDTO.swift').read_text()
     fields = re.search(r'enum Field:.*?\{ case (.*?) \}', detail_source).group(1).split(', ')
     detail_codes = re.findall(r'= "([A-Z_]+)"', detail_source)
     schemas['APIValidationDetail'] = object_schema(dict(field=dict(type='string', enum=fields), code=dict(type='string', enum=detail_codes)), ['field','code'])

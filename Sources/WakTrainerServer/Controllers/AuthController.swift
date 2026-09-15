@@ -42,17 +42,11 @@ struct AuthController: RouteCollection {
     }
 
     private func validate(email: String, password: String) throws {
-        guard email.utf8.count <= 254, email.contains("@"), email.contains(".") else {
-            throw APIError(.validationFailed, variant: .email)
-        }
-        try validate(password: password)
+        try AuthenticationValidation.validate(email: email, password: password)
     }
 
     private func validate(password: String) throws {
-        // bcrypt uses at most 72 bytes, including for multibyte characters.
-        guard (7...20).contains(password.count), password.utf8.count <= 72 else {
-            throw APIError(.validationFailed, variant: .password)
-        }
+        try AuthenticationValidation.validate(password: password)
     }
 
     @Sendable
@@ -154,19 +148,7 @@ struct AuthController: RouteCollection {
     @Sendable
     func refresh(req: Request) async throws -> SessionResponseDTO {
         let body = try req.content.decode(RefreshRequestDTO.self)
-        guard body.refreshToken.utf8.count == 64 else { throw APIError(.refreshTokenRejected) }
-        let hash = AuthSession.hash(body.refreshToken)
-        guard let existing = try await RefreshToken.query(on: req.db).filter(\.$tokenHash == hash).first() else {
-            throw APIError(.refreshTokenRejected)
-        }
-        let userID = existing.$user.id
-        return try await req.db.transaction { db in
-            let user = try await AuthSession.lockUser(userID, on: db)
-            guard let session = try await RefreshToken.query(on: db).filter(\.$tokenHash == hash).first(),
-                  session.expiresAt > Date() else { throw APIError(.refreshTokenRejected) }
-            try await session.delete(on: db)
-            return try await AuthSession.issue(for: user, request: req, on: db, rotating: session)
-        }
+        return try await AuthSession.rotate(refreshToken: body.refreshToken, request: req)
     }
 
     @Sendable

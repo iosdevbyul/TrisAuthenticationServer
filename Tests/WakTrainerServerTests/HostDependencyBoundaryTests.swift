@@ -1,5 +1,5 @@
 @testable import WakTrainerServer
-import AuthenticationServerKit
+@testable import AuthenticationServerKit
 import Foundation
 import Testing
 import VaporTesting

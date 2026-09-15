@@ -9,14 +9,6 @@ import AuthenticationServerKit
 import Foundation
 import Vapor
 
-/// Transport abstraction. Application code uses EmailService.withRequest so the
-/// quota is consumed before account lookup or message/token preparation.
-protocol EmailSending: Sendable {
-    func send(_ message: EmailMessage, on req: Request) async throws
-}
-
-typealias EmailMessage = AuthenticationEmail
-
 extension AuthenticationEmail {
     static func signUpVerification(to email: String, verificationURL: String) -> Self {
         let escapedURL = verificationURL.replacingOccurrences(of: "&", with: "&amp;")
@@ -45,37 +37,6 @@ extension AuthenticationEmail {
             <p>비밀번호를 재설정하려면 아래 링크를 눌러주세요.</p>
             <p><a href="\(resetURL)">비밀번호 재설정</a></p>
             """)
-    }
-}
-
-struct EmailService: Sendable {
-    private let transport: (any EmailSending)?
-    private let limiter: EmailRateLimitService
-
-    init(transport: (any EmailSending)? = nil,
-         limiter: EmailRateLimitService = .init()) {
-        self.transport = transport
-        self.limiter = limiter
-    }
-
-    /// Returns false when throttled. The preparation closure is never run then.
-    /// The message recipient is bound to the quota; each request sends at most once.
-    func withRequest(to email: String, action: EmailAction, on req: Request,
-                     prepare: () async throws -> EmailMessage?) async throws -> Bool {
-        req.auditEmail(email)
-        guard try await limiter.allow(to: email, action: action, on: req) else {
-            req.auditContext.emailRateLimited = AuditMetadata.Action(rawValue: action.rawValue)
-            return false
-        }
-        if let message = try await prepare() {
-            guard message.recipient == email else { throw APIError(.internalError) }
-            if let transport {
-                try await transport.send(message, on: req)
-            } else {
-                try await req.application.authenticationDependencies.sendEmail(message, req)
-            }
-        }
-        return true
     }
 }
 

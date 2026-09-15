@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Vapor
 import Fluent
 import JWT

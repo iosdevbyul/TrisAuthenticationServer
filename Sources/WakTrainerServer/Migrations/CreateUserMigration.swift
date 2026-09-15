@@ -1,25 +1,13 @@
-//
-//  CreateUserMigration.swift
-//  WakTrainerServer
-//
-//  Created by COMATOKI on 2026-09-08.
-//
-
+import AuthenticationServerKit
 import Fluent
 
+/// Host migration identity compatibility wrapper; retained through Phase C.
 struct CreateUserMigration: AsyncMigration {
+    var name: String { "WakTrainerServer.CreateUserMigration" }
     func prepare(on database: any Database) async throws {
-        try await database.schema(User.schema)
-            .id()
-            .field("email", .string, .required)
-            .field("password_hash", .string, .required)
-            .field("created_at", .datetime)
-            .field("updated_at", .datetime)
-            .unique(on: "email")
-            .create()
+        try await AuthenticationMigrations.make(.createUserMigration).prepare(on: database)
     }
-
     func revert(on database: any Database) async throws {
-        try await database.schema(User.schema).delete()
+        try await AuthenticationMigrations.make(.createUserMigration).revert(on: database)
     }
 }

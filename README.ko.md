@@ -677,4 +677,4 @@ JSON 파일을 로컬 OpenAPI viewer로 열어 확인합니다. 운영 Swagger e
 
 ## AuthenticationServerKit 추출
 
-[Phase A 경계와 검증](docs/authentication-extraction-phase-a.md): local package skeleton, host dependency 주입, OpenAPI/migration baseline 고정까지 구현합니다. 실제 기능 이동은 Phase B/C 범위입니다.
+[Phase A 경계와 검증](docs/authentication-extraction-phase-a.md): local package skeleton, host dependency 주입, OpenAPI/migration baseline 고정까지 구현합니다. Phase B에서는 재사용 구현을 package로 옮기고 controllers는 host에 유지합니다. [Phase B 추출 및 검증](docs/authentication-extraction-phase-b.md)을 참고하세요.

@@ -1,4 +1,4 @@
-import AuthenticationServerKit
+@testable import AuthenticationServerKit
 @testable import WakTrainerServer
 import Fluent
 import SQLKit

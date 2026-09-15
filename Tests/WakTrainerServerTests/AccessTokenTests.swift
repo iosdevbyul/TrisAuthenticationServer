@@ -1,3 +1,4 @@
+@testable import AuthenticationServerKit
 @testable import WakTrainerServer
 import Foundation
 import JWT

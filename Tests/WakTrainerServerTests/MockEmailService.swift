@@ -1,4 +1,4 @@
-import AuthenticationServerKit
+@testable import AuthenticationServerKit
 import Foundation
 import Vapor
 @testable import WakTrainerServer

@@ -1,19 +1,13 @@
+import AuthenticationServerKit
 import Fluent
-import SQLKit
-import Vapor
 
+/// Host migration identity compatibility wrapper; retained through Phase C.
 struct CreateLoginRateLimitMigration: AsyncMigration {
+    var name: String { "WakTrainerServer.CreateLoginRateLimitMigration" }
     func prepare(on database: any Database) async throws {
-        try await database.schema("login_rate_limits")
-            .field("bucket_key", .string, .identifier(auto: false))
-            .field("attempts", .int, .required)
-            .field("expires_at", .datetime, .required)
-            .create()
-        guard let sql = database as? any SQLDatabase else { throw Abort(.internalServerError) }
-        try await sql.raw("CREATE INDEX login_rate_limits_expiry_idx ON login_rate_limits (expires_at)").run()
+        try await AuthenticationMigrations.make(.createLoginRateLimitMigration).prepare(on: database)
     }
-
     func revert(on database: any Database) async throws {
-        try await database.schema("login_rate_limits").delete()
+        try await AuthenticationMigrations.make(.createLoginRateLimitMigration).revert(on: database)
     }
 }
