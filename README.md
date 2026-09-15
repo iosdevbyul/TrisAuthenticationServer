@@ -676,3 +676,7 @@ swift test --filter OpenAPIContractTests                     # no database requi
 
 Open the JSON in a local OpenAPI viewer. No production Swagger endpoint is added.
 GitHub Actions validates the document, references and generated-file freshness.
+
+## AuthenticationServerKit extraction
+
+[Phase A boundaries and validation](docs/authentication-extraction-phase-a.md): local package skeleton, host dependency injection and frozen OpenAPI/migration baselines. Runtime extraction is deferred to Phases B/C.

@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Vapor
 import Fluent
 import JWT
@@ -258,7 +259,7 @@ struct AuthController: RouteCollection {
                 let tokenHash = AuthSession.hash(rawToken)
                 let expiresAt = Date().addingTimeInterval(30 * 60)
 
-                guard let resetURLBase = passwordResetURLBase ?? Environment.get("PASSWORD_RESET_URL_BASE"),
+                guard let resetURLBase = passwordResetURLBase ?? req.application.authenticationDependencies.configuration.urls().passwordReset,
                       !resetURLBase.isEmpty else {
                     throw APIError(.internalError)
                 }
@@ -277,7 +278,7 @@ struct AuthController: RouteCollection {
                 guard let token else { return nil }
                 resetToken = token
 
-                return .passwordReset(to: body.email, resetURL: resetURL)
+                return req.application.authenticationDependencies.renderEmail(.passwordReset, body.email, resetURL)
             }
         } catch {
             if let resetToken { try? await resetToken.delete(on: req.db) }

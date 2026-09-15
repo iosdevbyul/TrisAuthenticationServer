@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Vapor
 import Fluent
 import SQLKit
@@ -16,7 +17,7 @@ enum LoginRateLimiter {
             )
             """).run()
         // Never trust client-supplied forwarding headers without a proxy trust policy.
-        let ip = req.remoteAddress?.ipAddress ?? "unknown"
+        let ip = req.application.authenticationDependencies.resolveIP(req, .login)
         try await consume(key: "ip:" + AuthSession.hash(ip), limit: 30, seconds: 60, on: req.db)
     }
 

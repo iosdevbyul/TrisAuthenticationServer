@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Fluent
 import Vapor
 import Foundation
@@ -28,14 +29,14 @@ struct EmailChangeService: Sendable {
                     }
                     let rawToken = AuthSession.randomToken()
                     let url = try EmailVerificationService.verificationURL(
-                        base: verificationURLBase ?? Environment.get("EMAIL_CHANGE_URL_BASE"),
+                        base: verificationURLBase ?? req.application.authenticationDependencies.configuration.urls().emailChange,
                         token: rawToken, setting: "EMAIL_CHANGE_URL_BASE")
                     try await EmailChangeToken.query(on: db).filter(\.$user.$id == userID).delete()
                     let token = EmailChangeToken(userID: userID, pendingEmail: newEmail,
                         tokenHash: AuthSession.hash(rawToken),
                         expiresAt: Date().addingTimeInterval(Self.tokenLifetime))
                     try await token.create(on: db)
-                    return (try token.requireID(), EmailMessage.emailChangeVerification(to: newEmail, verificationURL: url))
+                    return (try token.requireID(), req.application.authenticationDependencies.renderEmail(.emailChange, newEmail, url))
                 }
                 createdTokenID = prepared.0
                 return prepared.1

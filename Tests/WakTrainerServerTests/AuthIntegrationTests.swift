@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 @testable import WakTrainerServer
 import Fluent
 import SQLKit
@@ -178,6 +179,7 @@ struct AuthIntegrationTests {
             try await verifyAPIErrorContracts(app, emailService: emailService)
             try await verifyAuditLogging(app, emailService: emailService)
             try await verifyMaintenance(app, emailService: emailService)
+            try await verifyHostDependencies(app)
             try await app.autoRevert()
         }
     }

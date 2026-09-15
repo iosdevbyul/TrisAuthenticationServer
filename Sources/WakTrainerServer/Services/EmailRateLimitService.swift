@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Vapor
 import Fluent
 import SQLKit
@@ -45,7 +46,7 @@ struct EmailRateLimitService: Sendable {
         let client = clientValues.count == 1 ? clientValues.first : nil
         return try await allow(
             to: email, clientID: client,
-            ip: Self.clientIP(req, trustRailway: Environment.get("EMAIL_TRUST_RAILWAY_PROXY") == "true"),
+            ip: req.application.authenticationDependencies.resolveIP(req, .email),
             action: action, on: req.db
         )
     }

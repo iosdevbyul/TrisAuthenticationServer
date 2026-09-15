@@ -5,6 +5,7 @@
 //  Created by COMATOKI on 2026-09-08.
 //
 
+import AuthenticationServerKit
 import Foundation
 import Vapor
 
@@ -14,11 +15,9 @@ protocol EmailSending: Sendable {
     func send(_ message: EmailMessage, on req: Request) async throws
 }
 
-struct EmailMessage: Sendable {
-    let recipient: String
-    let subject: String
-    let html: String
+typealias EmailMessage = AuthenticationEmail
 
+extension AuthenticationEmail {
     static func signUpVerification(to email: String, verificationURL: String) -> Self {
         let escapedURL = verificationURL.replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "\"", with: "&quot;")
@@ -50,12 +49,12 @@ struct EmailMessage: Sendable {
 }
 
 struct EmailService: Sendable {
-    private let transport: any EmailSending
+    private let transport: (any EmailSending)?
     private let limiter: EmailRateLimitService
 
     init(transport: (any EmailSending)? = nil,
          limiter: EmailRateLimitService = .init()) {
-        self.transport = transport ?? ResendEmailTransport()
+        self.transport = transport
         self.limiter = limiter
     }
 
@@ -70,13 +69,17 @@ struct EmailService: Sendable {
         }
         if let message = try await prepare() {
             guard message.recipient == email else { throw APIError(.internalError) }
-            try await transport.send(message, on: req)
+            if let transport {
+                try await transport.send(message, on: req)
+            } else {
+                try await req.application.authenticationDependencies.sendEmail(message, req)
+            }
         }
         return true
     }
 }
 
-private struct ResendEmailTransport: EmailSending {
+struct ResendEmailTransport: EmailSending {
     func send(_ message: EmailMessage, on req: Request) async throws {
         guard let apiKey = Environment.get("RESEND_API_KEY"),
               !apiKey.isEmpty else {

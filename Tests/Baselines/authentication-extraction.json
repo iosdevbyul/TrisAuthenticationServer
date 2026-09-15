@@ -1,0 +1,19 @@
+{
+  "sha256": {
+    "docs/openapi/openapi.json": "232af101692ad6bbf9d07bc52d6b6886edb9a915a7a750516b5496d974d75a3d",
+    "docs/openapi/operations.json": "003cf32972dd8669b70f9a57d63db84f72d13c91dd9c72600fdfe79089ca9f48"
+  },
+  "migrations": [
+    "WakTrainerServer.CreateUserMigration",
+    "WakTrainerServer.CreateRefreshTokenMigration",
+    "WakTrainerServer.CreateLoginRateLimitMigration",
+    "WakTrainerServer.CreatePasswordResetTokenMigration",
+    "WakTrainerServer.CreateEmailRateLimitMigration",
+    "WakTrainerServer.AddEmailVerificationMigration",
+    "WakTrainerServer.AddEmailChangeMigration",
+    "WakTrainerServer.AddSessionMetadataMigration",
+    "WakTrainerServer.IndexSessionUserExpiryMigration",
+    "WakTrainerServer.CreateAuditLogMigration",
+    "WakTrainerServer.IndexMaintenanceExpiryMigration"
+  ]
+}

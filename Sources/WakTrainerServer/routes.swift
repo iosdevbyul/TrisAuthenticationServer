@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Vapor
 
 func routes(_ app: Application) throws {
@@ -6,5 +7,5 @@ func routes(_ app: Application) throws {
     }
 
     // AuthController 라우트 등록
-    try app.register(collection: AuthController())
+    try app.register(collection: AuthController(auditLog: .init(hashKey: app.authenticationDependencies.configuration.auditHashKey())))
 }

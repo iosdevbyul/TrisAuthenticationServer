@@ -1,4 +1,5 @@
-Packages
+/Packages/*
+!/Packages/AuthenticationServerKit/
 .build
 xcuserdata
 *.xcodeproj

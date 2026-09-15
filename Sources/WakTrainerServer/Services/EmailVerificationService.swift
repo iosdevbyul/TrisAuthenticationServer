@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Fluent
 import Vapor
 import Foundation
@@ -21,7 +22,7 @@ struct EmailVerificationService: Sendable {
                     guard user.email == email, !user.isEmailVerified else { return nil }
                     let rawToken = AuthSession.randomToken()
                     let url = try Self.verificationURL(
-                        base: verificationURLBase ?? Environment.get("EMAIL_VERIFICATION_URL_BASE"),
+                        base: verificationURLBase ?? req.application.authenticationDependencies.configuration.urls().emailVerification,
                         token: rawToken, setting: "EMAIL_VERIFICATION_URL_BASE")
                     try await EmailVerificationToken.query(on: db).filter(\.$user.$id == userID).delete()
                     let token = EmailVerificationToken(
@@ -29,7 +30,7 @@ struct EmailVerificationService: Sendable {
                         expiresAt: Date().addingTimeInterval(Self.tokenLifetime)
                     )
                     try await token.create(on: db)
-                    return (try token.requireID(), .signUpVerification(to: email, verificationURL: url))
+                    return (try token.requireID(), req.application.authenticationDependencies.renderEmail(.emailVerification, email, url))
                 }
                 createdTokenID = prepared?.0
                 return prepared?.1

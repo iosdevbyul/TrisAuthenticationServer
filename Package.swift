@@ -7,6 +7,7 @@ let package = Package(
        .macOS(.v13)
     ],
     dependencies: [
+        .package(path: "Packages/AuthenticationServerKit"),
         .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", exact: "4.9.2"),
         .package(
             url: "https://github.com/vapor/vapor.git",
@@ -38,6 +39,7 @@ let package = Package(
         .executableTarget(
             name: "WakTrainerServer",
             dependencies: [
+                .product(name: "AuthenticationServerKit", package: "AuthenticationServerKit"),
                 .product(name: "VaporToOpenAPI", package: "VaporToOpenAPI"),
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "NIOCore", package: "swift-nio"),
@@ -53,6 +55,7 @@ let package = Package(
             name: "WakTrainerServerTests",
             dependencies: [
                 .target(name: "WakTrainerServer"),
+                .product(name: "AuthenticationServerKit", package: "AuthenticationServerKit"),
                 .product(name: "VaporTesting", package: "vapor"),
             ],
             swiftSettings: swiftSettings

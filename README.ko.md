@@ -674,3 +674,7 @@ swift test --filter OpenAPIContractTests                     # DB 불필요
 JSON 파일을 로컬 OpenAPI viewer로 열어 확인합니다. 운영 Swagger endpoint는
 추가하지 않습니다. GitHub Actions에서 문서 유효성, reference 및 생성 결과의
 최신 상태를 검증합니다. 전체 테스트의 테스트 DB 준비 방법은 위 테스트 절을 따릅니다.
+
+## AuthenticationServerKit 추출
+
+[Phase A 경계와 검증](docs/authentication-extraction-phase-a.md): local package skeleton, host dependency 주입, OpenAPI/migration baseline 고정까지 구현합니다. 실제 기능 이동은 Phase B/C 범위입니다.

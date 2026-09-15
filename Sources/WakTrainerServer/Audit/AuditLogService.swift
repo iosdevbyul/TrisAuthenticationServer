@@ -1,3 +1,4 @@
+import AuthenticationServerKit
 import Vapor
 import Fluent
 import SQLKit
@@ -14,7 +15,7 @@ final class AuditLogService: @unchecked Sendable {
     private var warnAfter = Date.distantPast
     private var retryAfter = Date.distantPast
 
-    init(hashKey: String? = Environment.get("AUDIT_HASH_KEY")) {
+    init(hashKey: String? = AuthenticationHostDependencies.live().configuration.auditHashKey()) {
         self.key = hashKey.flatMap { $0.isEmpty ? nil : $0 }
     }
 
@@ -30,7 +31,7 @@ final class AuditLogService: @unchecked Sendable {
 
     func record(_ event: AuditEventType, context: AuditContext, metadata: AuditMetadata, on req: Request) async {
         let now = Date()
-        let ip = EmailRateLimitService.clientIP(req, trustRailway: Environment.get("EMAIL_TRUST_RAILWAY_PROXY") == "true")
+        let ip = req.application.authenticationDependencies.resolveIP(req, .audit)
         let ipHash = ip == "unknown" ? nil : identifierHash(ip, kind: .ip)
         let clients = req.headers["X-Client-ID"]
         let client = clients.count == 1 ? clients.first?.trimmingCharacters(in: .whitespacesAndNewlines) : nil

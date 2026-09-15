@@ -1,10 +1,13 @@
+import AuthenticationServerKit
 import Vapor
 import Fluent
 import FluentPostgresDriver
 import JWT
 import JWTKit
 
-func configure(_ app: Application) async throws {
+func configure(_ app: Application,
+               authenticationDependencies: AuthenticationDependencies<Request> = AuthenticationHostDependencies.live()) async throws {
+    app.authenticationDependencies = authenticationDependencies
     let databasePrefix = app.environment == .testing ? "TEST_DATABASE_" : "DATABASE_"
     let databaseName = Environment.get(databasePrefix + "NAME") ?? "waktrainer"
     if app.environment == .testing, databaseName != "waktrainer_test_auth" {
@@ -49,17 +52,7 @@ func configure(_ app: Application) async throws {
         digestAlgorithm: digestAlgorithm
     )
 
-    app.migrations.add(CreateUserMigration())
-    app.migrations.add(CreateRefreshTokenMigration())
-    app.migrations.add(CreateLoginRateLimitMigration())
-    app.migrations.add(CreatePasswordResetTokenMigration())
-    app.migrations.add(CreateEmailRateLimitMigration())
-    app.migrations.add(AddEmailVerificationMigration())
-    app.migrations.add(AddEmailChangeMigration())
-    app.migrations.add(AddSessionMetadataMigration())
-    app.migrations.add(IndexSessionUserExpiryMigration())
-    app.migrations.add(CreateAuditLogMigration())
-    app.migrations.add(IndexMaintenanceExpiryMigration())
+    app.migrations.add(AuthenticationMigrationBaseline.migrations())
     APIErrorMiddleware.install(on: app)
     try routes(app)
 }
