@@ -5,7 +5,7 @@ import JWT
 import Foundation
 
 /// Separate from application logging. Awaited, best-effort writes after business commit.
-public final class AuditLogService: @unchecked Sendable {
+final class AuditLogService: @unchecked Sendable {
     enum IdentifierKind: String { case email, ip, client }
     private let key: String?
     private let resolveIP: @Sendable (Request) -> String
@@ -15,7 +15,7 @@ public final class AuditLogService: @unchecked Sendable {
     private var warnAfter = Date.distantPast
     private var retryAfter = Date.distantPast
 
-    public init(hashKey: String?, resolveIP: @escaping @Sendable (Request) -> String) {
+    init(hashKey: String?, resolveIP: @escaping @Sendable (Request) -> String) {
         self.resolveIP = resolveIP
         self.key = hashKey.flatMap { $0.isEmpty ? nil : $0 }
     }

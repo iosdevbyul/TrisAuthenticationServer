@@ -83,8 +83,8 @@ def generate():
     schemas['ManagedSessionResponseDTO']['description'] = 'id is the stable management UUID. createdAt is current row creation; startedAt is login start (legacy fallback may differ); lastRefreshedAt records successful refresh only. ISO-8601 dates; missing optional fields are omitted.'
     schemas['SessionResponseDTO']['description'] = 'Both tokens are currently issued on success. refreshToken remains optional in the Swift DTO. Refresh lifetime is approximately 30 days.'
     metadata = json.loads((ROOT / 'docs/openapi/operations.json').read_text())
-    controller = (SOURCE / 'Controllers/AuthController.swift').read_text()
-    handlers = controller + (SOURCE / 'Controllers/SessionController.swift').read_text()
+    controller = contract_source('Controllers/AuthController.swift').read_text()
+    handlers = controller + contract_source('Controllers/SessionController.swift').read_text()
     paths = {}
     seen = set()
     for method, args, handler in re.findall(r'\.(get|post|delete)\(([^\n]+?), use: (\w+)\)', controller):

@@ -6,6 +6,8 @@ func routes(_ app: Application) throws {
         "Hello, world!"
     }
 
-    // AuthController 라우트 등록
-    try app.register(collection: AuthController(auditLog: .init(hashKey: app.authenticationDependencies.configuration.auditHashKey())))
+    // Host configuration is resolved at the original request/registration boundaries.
+    try app.register(collection: AuthenticationRoutes(
+        dependencies: { $0.application.authenticationDependencies },
+        auditHashKey: app.authenticationDependencies.configuration.auditHashKey()))
 }

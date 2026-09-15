@@ -18,3 +18,28 @@ jobs:
       - run: pip install -r scripts/openapi-requirements.txt
       - run: python scripts/openapi.py --check
       - run: python -m unittest discover -s scripts -p 'test_openapi.py'
+
+  swift:
+    runs-on: ubuntu-latest
+    container: swift:6.3-noble
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: waktrainer_test_auth
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd "pg_isready -U postgres -d waktrainer_test_auth"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_NAME: waktrainer_test_auth
+      TEST_DATABASE_HOST: postgres
+      TEST_DATABASE_PORT: '5432'
+      TEST_DATABASE_USERNAME: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift build
+      - run: swift build --package-path Packages/AuthenticationServerKit --scratch-path "$GITHUB_WORKSPACE/.build"
+      # Both integration suites use the same disposable database, in sequence.
+      - run: swift test --package-path Packages/AuthenticationServerKit --scratch-path "$GITHUB_WORKSPACE/.build" --no-parallel
+      - run: swift test --no-parallel

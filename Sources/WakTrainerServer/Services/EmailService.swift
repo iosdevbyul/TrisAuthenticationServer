@@ -40,8 +40,8 @@ extension AuthenticationEmail {
     }
 }
 
-struct ResendEmailTransport: EmailSending {
-    func send(_ message: EmailMessage, on req: Request) async throws {
+struct ResendEmailTransport {
+    func send(_ message: AuthenticationEmail, on req: Request) async throws {
         guard let apiKey = Environment.get("RESEND_API_KEY"),
               !apiKey.isEmpty else {
             throw APIError(.internalError)

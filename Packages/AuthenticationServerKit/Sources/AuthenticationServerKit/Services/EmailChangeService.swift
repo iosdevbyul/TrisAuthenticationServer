@@ -3,20 +3,20 @@ import Vapor
 import Foundation
 import JWT
 
-public struct EmailChangeService: Sendable {
+struct EmailChangeService: Sendable {
     static let tokenLifetime: TimeInterval = 30 * 60
     let emailService: EmailService
     var verificationURLBase: String?
     private let dependencies: @Sendable (Request) -> AuthenticationDependencies<Request>
 
-    public init(emailService: EmailService, verificationURLBase: String? = nil,
+    init(emailService: EmailService, verificationURLBase: String? = nil,
                 dependencies: @escaping @Sendable (Request) -> AuthenticationDependencies<Request>) {
         self.emailService = emailService
         self.verificationURLBase = verificationURLBase
         self.dependencies = dependencies
     }
 
-    public func request(newEmail: String, currentPassword: String,
+    func request(newEmail: String, currentPassword: String,
                  payload: AccessTokenPayload, on req: Request) async throws {
         guard let userID = UUID(uuidString: payload.subject.value) else { throw APIError(.sessionInvalid, variant: .legacyUnauthorized) }
         var createdTokenID: UUID?
@@ -60,7 +60,7 @@ public struct EmailChangeService: Sendable {
         }
     }
 
-    public func confirm(token rawToken: String, payload: AccessTokenPayload, on req: Request) async throws {
+    func confirm(token rawToken: String, payload: AccessTokenPayload, on req: Request) async throws {
         let invalid = APIError(.emailChangeTokenInvalid)
         guard rawToken.utf8.count == 64 else { throw invalid }
         guard let userID = UUID(uuidString: payload.subject.value) else { throw APIError(.sessionInvalid, variant: .legacyUnauthorized) }

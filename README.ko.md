@@ -678,3 +678,5 @@ JSON 파일을 로컬 OpenAPI viewer로 열어 확인합니다. 운영 Swagger e
 ## AuthenticationServerKit 추출
 
 [Phase A 경계와 검증](docs/authentication-extraction-phase-a.md): local package skeleton, host dependency 주입, OpenAPI/migration baseline 고정까지 구현합니다. Phase B에서는 재사용 구현을 package로 옮기고 controllers는 host에 유지합니다. [Phase B 추출 및 검증](docs/authentication-extraction-phase-b.md)을 참고하세요.
+
+[Phase C 구현 및 검증](docs/authentication-extraction-phase-c.md): HTTP route 소유권 이동, 공개 API 축소, 독립 host/통합 테스트와 Docker/CI local package 처리를 설명합니다.

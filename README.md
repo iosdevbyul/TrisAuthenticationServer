@@ -680,3 +680,5 @@ GitHub Actions validates the document, references and generated-file freshness.
 ## AuthenticationServerKit extraction
 
 [Phase A boundaries and validation](docs/authentication-extraction-phase-a.md): local package skeleton, host dependency injection and frozen OpenAPI/migration baselines. Phase B moves the reusable implementation while controllers remain in the host. See [Phase B extraction and validation](docs/authentication-extraction-phase-b.md).
+
+[Phase C completion and validation](docs/authentication-extraction-phase-c.md): package-owned HTTP routes, reduced public API, independent host/integration tests and local-package Docker/CI support.

@@ -1,52 +1,82 @@
-# AuthenticationServerKit — Phase B
+# AuthenticationServerKit
 
-Reusable Swift 6.3 authentication implementation for Vapor and PostgreSQL. The
-package has no WakTrainerServer/iOS AuthenticationKit dependency, environment
-lookup, provider adapter, branded template, controller or route registration.
-It is not yet a standalone authentication application; host composition is
-intentionally retained until Phase C.
+Reusable Swift 6.3 authentication for Vapor and PostgreSQL. The package owns the
+17 `/auth` routes, request/response/error contracts, controllers and authentication
+implementation. It imports neither a consuming server nor the iOS client package.
 
-Dependencies are Vapor, Fluent, SQLKit, JWT and JWTKit. JWTKit retains the host's
-5.6.0 compiler compatibility pin. PostgreSQL driver installation and connection
-configuration belong to the host. No additional database backend is supported.
+## Host integration
 
-Integration surface:
+Configure the host's PostgreSQL connections, JWT signing keys and dependency
+providers before registering routes. The package does not read environment
+variables, choose a mail provider, trust forwarding headers or install middleware.
 
-- Phase A `AuthenticationURLs`, `AuthenticationConfiguration`,
-  `AuthenticationEmail`, email/IP purposes and `AuthenticationDependencies<Context>`.
-- Request/response DTOs, `APIError`, its closed code/validation contract, and
-  `AuthenticationValidation`.
-- Models required by the still-host-owned controller queries: `User`,
-  `RefreshToken`, `PasswordResetToken`, `EmailChangeToken`.
-- `AuthenticationMigrations.make(_:)` delegates one schema step at a time. It
-  never registers migrations. Existing hosts must retain historical migration
-  names/order and must not additionally register new package migration names.
-- `AccessTokenPayload`, `AuthSession`, `LoginRateLimiter`,
-  `EmailRateLimitService`/policy, email services/gateway, audit middleware/service
-  and maintenance service/policy.
+```swift
+import AuthenticationServerKit
+import Vapor
 
-Email services receive a request-to-dependencies provider; rate limiters and
-audit receive explicit IP resolvers. The host owns URL configuration, audit key,
-JWT signing setup, database connections (including the audit connection), email
-rendering/transport, trusted proxy policy and maintenance scheduling. Providers
-remain lazy at the existing operation boundaries. Closures must be thread-safe.
-Never log rendered links, credentials or secrets. The audit key is captured when
-the host constructs its audit service.
+// `dependencies` is supplied by the host, with thread-safe providers/closures.
+let authentication = AuthenticationRoutes(
+    dependencies: { _ in dependencies },
+    auditHashKey: dependencies.configuration.auditHashKey()
+)
+app.middleware.use(APIErrorMiddleware()) // host chooses the installation order
+try app.register(collection: authentication) // 17 routes under /auth
+// Alternatively register on app.grouped("v1") for /v1/auth/... .
+```
 
-SQL helpers, audit persistence/metadata internals, token verification records and
-implementation migrations are internal. Some model fields and `AuthSession`
-helpers remain public because controllers still compose transactions in the
-host; revisit that surface when controllers move in Phase C. Tests use
-`@testable import` instead of widening production access for testing.
+`AuthenticationRoutes` takes a request-to-dependencies provider, the audit key
+captured at registration, and an optional `EmailRateLimitPolicy`. The provider is
+called lazily at the original operation boundaries. Request-specific hosts may
+resolve dependencies from their own Application storage. A host replacing Vapor's
+default error middleware must do so explicitly before installing APIErrorMiddleware;
+registering the routes does not alter the middleware stack.
 
-Build/test from the repository root:
+The host supplies URL configuration, rendering/delivery, login/email/audit IP
+resolution, DB/JWT/password-hasher setup and the separate `DatabaseID.audit`
+connection. Direct IP versus trusted-proxy policy is entirely host-owned.
+Never log credentials, rendered links or configuration secrets.
+
+## Public API
+
+- Configuration/dependency values: `AuthenticationURLs`,
+  `AuthenticationConfiguration`, `AuthenticationDependencies`,
+  `AuthenticationEmail` and email/IP purposes.
+- `AuthenticationRoutes` and `APIErrorMiddleware` for explicit HTTP integration.
+- All request/response DTOs and the existing APIError/code/validation-detail contract.
+- `EmailRateLimitPolicy`, its Window values and EmailAction policy keys.
+- `AuthenticationMigrations.Step`/`make(_:)` for explicit host migration registration.
+- `MaintenancePolicy`, `DatabaseMaintenanceService.run` and `Result.succeeded` for
+  host-owned scheduling/commands; `DatabaseID.audit` for audit pool configuration.
+
+Controllers, models, AuthSession/JWT payload, hash/token/SQL helpers, validation,
+email gateway/services and audit implementation are internal/private. They are not
+part of the consuming host's API. Package tests use `@testable`; the standalone
+host test target deliberately uses only normal public imports.
+
+## Migrations
+
+The package does not automatically register or run migrations. Existing consumers
+must retain their recorded migration identities/order. WakTrainerServer's eleven
+compatibility wrappers delegate to the package and remain required. Never register
+package implementation migrations in addition to those wrappers. New hosts can
+explicitly select the steps in dependency order; this is not a schema redesign or
+support for multiple database backends.
+
+## Build and test
 
 ```sh
 swift build --package-path Packages/AuthenticationServerKit
-swift test --package-path Packages/AuthenticationServerKit
+swift test --package-path Packages/AuthenticationServerKit --filter StandaloneHostTests
+swift test --package-path Packages/AuthenticationServerKit --no-parallel
 ```
 
-Package tests exercise contracts, injected dependencies and service invariants
-without a database or external email provider. The server retains the complete
-PostgreSQL integration suite, route/DTO contract tests and migration-history
-compatibility test. See [Phase B extraction notes](../../docs/authentication-extraction-phase-b.md).
+The full suite requires a disposable PostgreSQL database named
+`waktrainer_test_auth` and TEST_DATABASE_NAME/HOST/PORT/USERNAME/PASSWORD settings
+appropriate to that local database. It creates/reverts its test schema and uses
+mock email. Do not run the package and server integration suites concurrently on
+the same database. The standalone host test needs no database and verifies public
+registration, outer prefixes, error responses and absence of `/hello`.
+
+Vapor, Fluent, SQLKit, JWT and JWTKit are runtime dependencies. FluentPostgresDriver
+is used only by the integration-test target; the consuming host installs its own
+driver. Existing dependency versions and the JWTKit 5.6.0 compatibility pin remain.

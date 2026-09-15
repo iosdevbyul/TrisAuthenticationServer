@@ -1,23 +1,25 @@
-import AuthenticationServerKit
 import Vapor
 import Fluent
 import JWT
 
 struct AuthController: RouteCollection {
 
+    private let dependencies: @Sendable (Request) -> AuthenticationDependencies<Request>
     private let auditLog: AuditLogService
     private let emailService: EmailService
     private let passwordResetURLBase: String?
     private let emailChange: EmailChangeService
     private let emailVerification: EmailVerificationService
 
-    init(emailService: EmailService = EmailService(), passwordResetURLBase: String? = nil,
-         emailVerificationURLBase: String? = nil, emailChangeURLBase: String? = nil, auditLog: AuditLogService = .init()) {
+    init(emailService: EmailService, passwordResetURLBase: String? = nil,
+         emailVerificationURLBase: String? = nil, emailChangeURLBase: String? = nil, auditLog: AuditLogService,
+         dependencies: @escaping @Sendable (Request) -> AuthenticationDependencies<Request>) {
+        self.dependencies = dependencies
         self.auditLog = auditLog
-        self.emailChange = .init(emailService: emailService, verificationURLBase: emailChangeURLBase)
+        self.emailChange = .init(emailService: emailService, verificationURLBase: emailChangeURLBase, dependencies: dependencies)
         self.emailService = emailService
         self.passwordResetURLBase = passwordResetURLBase
-        self.emailVerification = .init(emailService: emailService, verificationURLBase: emailVerificationURLBase)
+        self.emailVerification = .init(emailService: emailService, verificationURLBase: emailVerificationURLBase, dependencies: dependencies)
     }
 
     func boot(routes: any RoutesBuilder) throws {
@@ -51,7 +53,7 @@ struct AuthController: RouteCollection {
 
     @Sendable
     func login(req: Request) async throws -> SessionResponseDTO {
-        try await LoginRateLimiter.checkIP(req)
+        try await LoginRateLimiter.checkIP(req, resolveIP: { dependencies($0).resolveIP($0, .login) })
         let body = try req.content.decode(AuthRequestDTO.self)
         req.auditEmail(body.email)
         try validate(email: body.email, password: body.password)
@@ -241,7 +243,7 @@ struct AuthController: RouteCollection {
                 let tokenHash = AuthSession.hash(rawToken)
                 let expiresAt = Date().addingTimeInterval(30 * 60)
 
-                guard let resetURLBase = passwordResetURLBase ?? req.application.authenticationDependencies.configuration.urls().passwordReset,
+                guard let resetURLBase = passwordResetURLBase ?? dependencies(req).configuration.urls().passwordReset,
                       !resetURLBase.isEmpty else {
                     throw APIError(.internalError)
                 }
@@ -260,7 +262,7 @@ struct AuthController: RouteCollection {
                 guard let token else { return nil }
                 resetToken = token
 
-                return req.application.authenticationDependencies.renderEmail(.passwordReset, body.email, resetURL)
+                return dependencies(req).renderEmail(.passwordReset, body.email, resetURL)
             }
         } catch {
             if let resetToken { try? await resetToken.delete(on: req.db) }

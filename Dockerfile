@@ -14,9 +14,10 @@ WORKDIR /build
 
 # First just resolve dependencies.
 # This creates a cached layer that can be reused
-# as long as your Package.swift/Package.resolved
-# files do not change.
+# while the root manifests and local authentication package do not change.
 COPY ./Package.* ./
+# Local package must exist before SwiftPM resolves the root manifest.
+COPY ./Packages/AuthenticationServerKit ./Packages/AuthenticationServerKit
 RUN swift package resolve \
         $([ -f ./Package.resolved ] && echo "--force-resolved-versions" || true)
 

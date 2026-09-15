@@ -65,7 +65,8 @@ def main():
         derived = artifacts / 'DerivedData'
         destination = f'platform=iOS Simulator,id={args.simulator}'
         run(['xcodebuild', 'build-for-testing', '-project', 'Example/AuthenticationKitDemo/AuthenticationKitDemo.xcodeproj',
-             '-scheme', 'AuthenticationKitDemo', '-destination', destination,
+             '-scheme', 'AuthenticationKitDemo-Local', '-configuration', 'Debug',
+             'API_BASE_URL=http://127.0.0.1:8080', '-destination', destination,
              '-derivedDataPath', str(derived)], 'demo-build.log', cwd=kit)
 
         email = f'reset-{uuid.uuid4()}@example.com'

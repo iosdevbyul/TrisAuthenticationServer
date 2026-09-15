@@ -1,5 +1,4 @@
 @testable import AuthenticationServerKit
-@testable import WakTrainerServer
 import Testing
 import VaporTesting
 import Foundation
@@ -14,7 +13,8 @@ struct APIErrorMiddlewareTests {
     @Test func productionContractsAndRedaction() async throws {
         let app = try await Application.make(.production)
         do {
-            APIErrorMiddleware.install(on: app)
+            app.middleware = .init()
+            app.middleware.use(APIErrorMiddleware())
             let sentinels = ["SELECT password_hash FROM users", "DB connection failure detail", "JWT_SECRET",
                 "private-env-value", "/private/server/config.swift", "stack trace frame", "Authorization",
                 "Bearer private-access", "private-refresh-token", "private-password", "private-verification-token",

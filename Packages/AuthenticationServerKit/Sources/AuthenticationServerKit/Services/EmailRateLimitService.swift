@@ -2,16 +2,16 @@ import Vapor
 import Fluent
 import SQLKit
 
-public struct EmailRateLimitService: Sendable {
+struct EmailRateLimitService: Sendable {
     var policy: EmailRateLimitPolicy
     private let resolveIP: @Sendable (Request) -> String
 
-    public init(policy: EmailRateLimitPolicy = .init(), resolveIP: @escaping @Sendable (Request) -> String) {
+    init(policy: EmailRateLimitPolicy = .init(), resolveIP: @escaping @Sendable (Request) -> String) {
         self.policy = policy
         self.resolveIP = resolveIP
     }
 
-    public func allow(to email: String, action: EmailAction, on req: Request) async throws -> Bool {
+    func allow(to email: String, action: EmailAction, on req: Request) async throws -> Bool {
         let clientValues = req.headers["X-Client-ID"]
         let client = clientValues.count == 1 ? clientValues.first : nil
         return try await allow(

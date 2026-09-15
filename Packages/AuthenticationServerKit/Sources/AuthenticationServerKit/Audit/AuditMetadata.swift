@@ -1,8 +1,8 @@
 import Foundation
 
-public struct AuditMetadata: Codable, Sendable {
+struct AuditMetadata: Codable, Sendable {
     enum Reason: String, Codable, Sendable { case invalidCredentials, invalidRefresh, rateLimited }
-    public enum Endpoint: String, Codable, Sendable {
+    enum Endpoint: String, Codable, Sendable {
         case signup, login, refresh, logout, logoutOtherSessions, logoutAll, sessionRevoke
         case changePassword, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail
         case requestEmailChange, confirmEmailChange, withdraw

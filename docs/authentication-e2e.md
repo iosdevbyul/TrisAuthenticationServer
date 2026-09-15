@@ -17,7 +17,7 @@ python3 scripts/run-authentication-e2e.py \
   --simulator '<available iOS simulator UDID>'
 ```
 
-The runner refuses to start if port 8080 is already occupied. It builds the server, applies migrations in testing mode, starts its own server on `127.0.0.1:8080`, builds the Demo, creates a disposable password reset fixture, and runs the Demo's API and UI tests. It stops its server and reverts the test migrations in `finally`. It never stops a pre-existing server. Do not run server integration tests or another E2E runner concurrently against this shared disposable database.
+The runner selects `AuthenticationKitDemo-Local`, forces Debug and pins `API_BASE_URL` to `http://127.0.0.1:8080`; the Production scheme is never selected. It refuses to start if port 8080 is already occupied. It builds the server, applies migrations in testing mode, starts its own server on `127.0.0.1:8080`, builds the Demo, creates a disposable password reset fixture, and runs the Demo's API and UI tests. It stops its server and reverts the test migrations in `finally`. It never stops a pre-existing server. Do not run server integration tests or another E2E runner concurrently against this shared disposable database.
 
 Build logs, test logs, and `E2E.xcresult` are saved in the printed temporary artifact directory. Random reset credentials are injected into a private `.xctestrun` file and removed after execution. Neither the runner nor the tests print token values. E2E fixture requests use synthetic `example.com` accounts; no real mail is sent by the automated suite.
 

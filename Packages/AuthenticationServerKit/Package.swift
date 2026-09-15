@@ -6,6 +6,8 @@ let package = Package(
     platforms: [.macOS(.v13)],
     products: [.library(name: "AuthenticationServerKit", targets: ["AuthenticationServerKit"])],
     dependencies: [
+        // Used only by the PostgreSQL integration-test target.
+        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.12.0"),
         .package(url: "https://github.com/vapor/jwt.git", from: "5.0.0"),
         // Match the host's existing compiler compatibility constraint.
         .package(url: "https://github.com/vapor/jwt-kit.git", exact: "5.6.0"),
@@ -21,6 +23,8 @@ let package = Package(
             .product(name: "Fluent", package: "fluent"),
             .product(name: "SQLKit", package: "sql-kit"),
         ]),
+        .testTarget(name: "StandaloneHostTests", dependencies: [.target(name: "AuthenticationServerKit"), .product(name: "VaporTesting", package: "vapor"), .product(name: "JWT", package: "jwt")]),
+        .testTarget(name: "AuthenticationIntegrationTests", dependencies: [.target(name: "AuthenticationServerKit"), .product(name: "VaporTesting", package: "vapor"), .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver")]),
         .testTarget(name: "AuthenticationServerKitTests", dependencies: [.target(name: "AuthenticationServerKit"), .product(name: "VaporTesting", package: "vapor")]),
     ]
 )

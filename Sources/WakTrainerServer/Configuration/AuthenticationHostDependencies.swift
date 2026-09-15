@@ -1,9 +1,22 @@
 import AuthenticationServerKit
 import Vapor
+import NIOCore
 
 /// Composition belongs to the host; the package never reads Railway/environment
 /// settings or chooses Resend, branded templates or a trusted forwarding header.
 enum AuthenticationHostDependencies {
+    static func clientIP(_ req: Request, trustRailway: Bool) -> String {
+        // Enable only when ingress is restricted to Railway's trusted edge.
+        // Never guess a trusted hop from arbitrary X-Forwarded-For input.
+        if trustRailway, req.headers["X-Real-IP"].count == 1,
+           let value = req.headers.first(name: "X-Real-IP"),
+           let address = try? SocketAddress(ipAddress: value, port: 0),
+           let ip = address.ipAddress {
+            return ip
+        }
+        return req.remoteAddress?.ipAddress ?? "unknown"
+    }
+
     static func live() -> AuthenticationDependencies<Request> {
         .init(
             configuration: .init(
@@ -28,7 +41,7 @@ enum AuthenticationHostDependencies {
                 switch purpose {
                 case .login: return request.remoteAddress?.ipAddress ?? "unknown"
                 case .email, .audit:
-                    return EmailRateLimitService.clientIP(request,
+                    return Self.clientIP(request,
                         trustRailway: Environment.get("EMAIL_TRUST_RAILWAY_PROXY") == "true")
                 }
             }
@@ -42,7 +55,7 @@ private struct AuthenticationDependenciesKey: StorageKey {
 
 extension Application {
     /// Configure before registering routes. The fallback also supports existing
-    /// tests/tools that register AuthController without calling configure(_:).
+    /// tests/tools that register authentication routes without calling configure(_:).
     var authenticationDependencies: AuthenticationDependencies<Request> {
         get { storage[AuthenticationDependenciesKey.self] ?? AuthenticationHostDependencies.live() }
         set { storage[AuthenticationDependenciesKey.self] = newValue }

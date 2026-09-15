@@ -1,5 +1,4 @@
 @testable import AuthenticationServerKit
-@testable import WakTrainerServer
 import Fluent
 import SQLKit
 import FluentPostgresDriver
@@ -48,13 +47,17 @@ struct AuthIntegrationTests {
                 CreatePasswordResetTokenMigration(),
                 CreateEmailRateLimitMigration()
             )
-            try app.register(collection: AuthController(
-                emailService: EmailService(transport: emailService),
-                passwordResetURLBase: "https://example.com/reset-password",
-                emailVerificationURLBase: "https://example.com/verify-email",
-                emailChangeURLBase: "https://example.com/change-email?source=mail&token=replace-me",
-                auditLog: .init(hashKey: "audit-integration-fixture-key")
-            ))
+            var dependencies = TestDependencies.live()
+            dependencies.configuration = .init(urls: {
+                .init(passwordReset: "https://example.com/reset-password",
+                      emailVerification: "https://example.com/verify-email",
+                      emailChange: "https://example.com/change-email?source=mail&token=replace-me")
+            }, auditHashKey: { nil })
+            dependencies.sendEmail = { message, request in try await emailService.send(message, on: request) }
+            app.testAuthenticationDependencies = dependencies
+            try app.register(collection: AuthenticationRoutes(
+                dependencies: { $0.application.testAuthenticationDependencies },
+                auditHashKey: "audit-integration-fixture-key"))
             try await app.autoMigrate()
             // Simulate upgrading an existing installation before adding the new fields.
             let sql = try #require(app.db as? any SQLDatabase)
@@ -179,7 +182,6 @@ struct AuthIntegrationTests {
             try await verifyAPIErrorContracts(app, emailService: emailService)
             try await verifyAuditLogging(app, emailService: emailService)
             try await verifyMaintenance(app, emailService: emailService)
-            try await verifyHostDependencies(app)
             try await app.autoRevert()
         }
     }
@@ -346,14 +348,7 @@ struct AuthIntegrationTests {
         }
         #expect(try await !sensitive.allow(to: "same@example.com", clientID: nil,
             ip: "test", action: .signUpVerification, on: app.db))
-        // Optional client ID does not fail requests; untrusted forwarding is ignored.
-        let req = Request(application: app, on: app.eventLoopGroup.next())
-        req.headers.add(name: "X-Real-IP", value: "192.0.2.9")
-        req.headers.add(name: "X-Forwarded-For", value: "192.0.2.8")
-        #expect(AuthenticationHostDependencies.clientIP(req, trustRailway: false) == "unknown")
-        #expect(AuthenticationHostDependencies.clientIP(req, trustRailway: true) == "192.0.2.9")
-        req.headers.replaceOrAdd(name: "X-Real-IP", value: "invalid")
-        #expect(AuthenticationHostDependencies.clientIP(req, trustRailway: true) == "unknown")
+
     }
 
     private func verifyRateLimits(_ app: Application) async throws {

@@ -8,27 +8,27 @@
 import Fluent
 import Vapor
 
-public final class PasswordResetToken: Model, @unchecked Sendable {
-    public static let schema = "password_reset_tokens"
+final class PasswordResetToken: Model, @unchecked Sendable {
+    static let schema = "password_reset_tokens"
 
     @ID(key: .id)
-    public var id: UUID?
+    var id: UUID?
 
     @Parent(key: "user_id")
-    public var user: User
+    var user: User
 
     @Field(key: "token_hash")
-    public var tokenHash: String
+    var tokenHash: String
 
     @Timestamp(key: "expires_at", on: .none)
-    public var expiresAt: Date?
+    var expiresAt: Date?
 
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?
 
-    public init() {}
+    init() {}
 
-    public init(
+    init(
         id: UUID? = nil,
         userID: UUID,
         tokenHash: String,

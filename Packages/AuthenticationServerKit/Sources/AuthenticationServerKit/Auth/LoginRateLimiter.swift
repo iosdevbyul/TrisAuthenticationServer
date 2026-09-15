@@ -4,8 +4,8 @@ import SQLKit
 
 /// PostgreSQL-backed fixed windows shared by all instances using the same database.
 /// Counts all attempts before authentication, independently of account existence.
-public enum LoginRateLimiter {
-    public static func checkIP(_ req: Request, resolveIP: @Sendable (Request) -> String) async throws {
+enum LoginRateLimiter {
+    static func checkIP(_ req: Request, resolveIP: @Sendable (Request) -> String) async throws {
         let sql = try database(req.db)
         // Bound cleanup work and skip rows being updated by other requests.
         try await sql.raw("""
@@ -20,7 +20,7 @@ public enum LoginRateLimiter {
         try await consume(key: "ip:" + AuthSession.hash(ip), limit: 30, seconds: 60, on: req.db)
     }
 
-    public static func checkEmail(_ email: String, on db: any Database) async throws {
+    static func checkEmail(_ email: String, on db: any Database) async throws {
         // This only groups rate-limit buckets; it does not change account lookup/storage.
         let key = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         try await consume(key: "email:" + AuthSession.hash(key), limit: 10, seconds: 900, on: db)

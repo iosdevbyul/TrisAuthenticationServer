@@ -2,18 +2,18 @@ import Vapor
 
 /// The handler has returned only after its business transaction commits. Errors
 /// cannot produce success events. This middleware never decodes bodies or JWTs.
-public struct AuditLogMiddleware: AsyncMiddleware {
+struct AuditLogMiddleware: AsyncMiddleware {
     let service: AuditLogService
     let event: AuditEventType
     let endpoint: AuditMetadata.Endpoint
 
-    public init(service: AuditLogService, event: AuditEventType, endpoint: AuditMetadata.Endpoint) {
+    init(service: AuditLogService, event: AuditEventType, endpoint: AuditMetadata.Endpoint) {
         self.service = service
         self.event = event
         self.endpoint = endpoint
     }
 
-    public func respond(to req: Request, chainingTo next: any AsyncResponder) async throws -> Response {
+    func respond(to req: Request, chainingTo next: any AsyncResponder) async throws -> Response {
         req.storage[AuditRecorderKey.self] = service
         do {
             let response = try await next.respond(to: req)

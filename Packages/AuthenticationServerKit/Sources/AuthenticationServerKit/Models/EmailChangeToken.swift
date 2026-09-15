@@ -1,14 +1,14 @@
 import Fluent
 import Vapor
 
-public final class EmailChangeToken: Model, @unchecked Sendable {
-    public static let schema = "email_change_tokens"
+final class EmailChangeToken: Model, @unchecked Sendable {
+    static let schema = "email_change_tokens"
 
     @ID(key: .id)
-    public var id: UUID?
+    var id: UUID?
 
     @Parent(key: "user_id")
-    public var user: User
+    var user: User
 
     @Field(key: "pending_email")
     var pendingEmail: String
@@ -22,7 +22,7 @@ public final class EmailChangeToken: Model, @unchecked Sendable {
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?
 
-    public init() {}
+    init() {}
 
     init(userID: UUID, pendingEmail: String, tokenHash: String, expiresAt: Date) {
         self.$user.id = userID

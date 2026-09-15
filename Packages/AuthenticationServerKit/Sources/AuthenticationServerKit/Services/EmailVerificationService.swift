@@ -2,13 +2,13 @@ import Fluent
 import Vapor
 import Foundation
 
-public struct EmailVerificationService: Sendable {
+struct EmailVerificationService: Sendable {
     static let tokenLifetime: TimeInterval = 24 * 60 * 60
     let emailService: EmailService
     var verificationURLBase: String?
     private let dependencies: @Sendable (Request) -> AuthenticationDependencies<Request>
 
-    public init(emailService: EmailService, verificationURLBase: String? = nil,
+    init(emailService: EmailService, verificationURLBase: String? = nil,
                 dependencies: @escaping @Sendable (Request) -> AuthenticationDependencies<Request>) {
         self.emailService = emailService
         self.verificationURLBase = verificationURLBase
@@ -17,7 +17,7 @@ public struct EmailVerificationService: Sendable {
 
     /// Account lookup is inside the common limiter, including unknown/verified accounts.
     /// Callers return a generic message; mail failures never roll back an existing account.
-    public func send(to email: String, on req: Request) async throws {
+    func send(to email: String, on req: Request) async throws {
         var createdTokenID: UUID?
         do {
             _ = try await emailService.withRequest(to: email, action: .signUpVerification, on: req) {
@@ -66,7 +66,7 @@ public struct EmailVerificationService: Sendable {
         return url
     }
 
-    public func verify(token rawToken: String, on req: Request) async throws {
+    func verify(token rawToken: String, on req: Request) async throws {
         let invalid = APIError(.emailVerificationTokenInvalid)
         guard rawToken.utf8.count == 64 else { throw invalid }
         let hash = AuthSession.hash(rawToken)

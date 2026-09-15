@@ -1,7 +1,7 @@
 import Vapor
 
 // Persist raw strings, not a PostgreSQL enum, so new event types need no schema change.
-public enum AuditEventType: String, Codable, Sendable {
+enum AuditEventType: String, Codable, Sendable {
     case signUpSucceeded, loginSucceeded, loginFailed, refreshSucceeded, refreshRejected
     case logout, logoutOtherSessions, logoutAll, sessionRevoked
     case passwordChanged, passwordResetRequested, passwordResetSucceeded
@@ -21,7 +21,7 @@ public enum AuditEventType: String, Codable, Sendable {
 struct AuditRecorderKey: StorageKey { typealias Value = AuditLogService }
 
 extension Request {
-    public func auditEmail(_ email: String) {
+    func auditEmail(_ email: String) {
         guard email.utf8.count <= 254 else { return }
         auditContext.emailHash = storage[AuditRecorderKey.self]?.identifierHash(email, kind: .email)
     }

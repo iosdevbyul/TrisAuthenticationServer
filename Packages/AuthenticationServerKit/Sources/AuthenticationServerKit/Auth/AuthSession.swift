@@ -3,21 +3,21 @@ import Fluent
 import JWT
 import SQLKit
 
-public enum AuthSession {
+enum AuthSession {
     static let accessLifetime: TimeInterval = 15 * 60
     static let refreshLifetime: TimeInterval = 30 * 24 * 60 * 60
 
-    public static func hash(_ token: String) -> String {
+    static func hash(_ token: String) -> String {
         SHA256.hash(data: Data(token.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
-    public static func randomToken() -> String {
+    static func randomToken() -> String {
         var generator = SystemRandomNumberGenerator()
         return (0..<32).map { _ in String(format: "%02x", UInt8.random(in: .min ... .max, using: &generator)) }.joined()
     }
 
     // Serialize session mutations per user, including concurrent refresh requests.
-    public static func lockUser(_ id: UUID, on database: any Database) async throws -> User {
+    static func lockUser(_ id: UUID, on database: any Database) async throws -> User {
         guard let sql = database as? any SQLDatabase else {
             throw APIError(.internalError)
         }
@@ -28,7 +28,7 @@ public enum AuthSession {
         return user
     }
 
-    public static func payload(from req: Request) async throws -> AccessTokenPayload {
+    static func payload(from req: Request) async throws -> AccessTokenPayload {
         guard req.headers.bearerAuthorization != nil else { throw APIError(.authenticationRequired) }
         do {
             let payload = try await req.jwt.verify(as: AccessTokenPayload.self)
@@ -41,7 +41,7 @@ public enum AuthSession {
         }
     }
 
-    public static func validate(_ payload: AccessTokenPayload, on database: any Database, request: Request? = nil) async throws -> RefreshToken {
+    static func validate(_ payload: AccessTokenPayload, on database: any Database, request: Request? = nil) async throws -> RefreshToken {
         guard let sessionID = payload.sessionID,
               let userID = UUID(uuidString: payload.subject.value),
               let session = try await RefreshToken.find(sessionID, on: database),
@@ -63,7 +63,7 @@ public enum AuthSession {
     }
 
     /// Caller holds the user lock (or owns a newly inserted user). Bounded per-user cleanup.
-    public static func cleanupExpired(for userID: UUID, on database: any Database) async throws {
+    static func cleanupExpired(for userID: UUID, on database: any Database) async throws {
         guard let sql = database as? any SQLDatabase else { throw APIError(.internalError) }
         try await sql.raw("""
             DELETE FROM refresh_tokens WHERE id IN (
@@ -75,7 +75,7 @@ public enum AuthSession {
     }
 
     /// Preserves the original refresh lookup, lock, re-read and rotation transaction.
-    public static func rotate(refreshToken: String, request req: Request) async throws -> SessionResponseDTO {
+    static func rotate(refreshToken: String, request req: Request) async throws -> SessionResponseDTO {
         guard refreshToken.utf8.count == 64 else { throw APIError(.refreshTokenRejected) }
         let hash = AuthSession.hash(refreshToken)
         guard let existing = try await RefreshToken.query(on: req.db).filter(\.$tokenHash == hash).first() else {
@@ -91,7 +91,7 @@ public enum AuthSession {
         }
     }
 
-    public static func issue(for user: User, request: Request, on database: any Database) async throws -> SessionResponseDTO {
+    static func issue(for user: User, request: Request, on database: any Database) async throws -> SessionResponseDTO {
         try await issue(for: user, request: request, on: database, rotating: nil)
     }
 
