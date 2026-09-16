@@ -19,7 +19,7 @@ x-shared_environment: &shared_environment
 services:
 
   app:
-    image: waktrainerserver:latest
+    image: trisauthenticationserver:latest
     build:
       context: .
     environment:

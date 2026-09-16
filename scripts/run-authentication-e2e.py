@@ -19,7 +19,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--authentication-kit', type=Path, required=True)
     parser.add_argument('--simulator', required=True, help='Available iOS simulator UDID')
-    parser.add_argument('--container', default='waktrainerserver-db-1')
+    parser.add_argument('--container', default='trisauthenticationserver-db-1')
     parser.add_argument('--database-user', default='vapor')
     args = parser.parse_args()
     server_root = Path(__file__).resolve().parents[1]
