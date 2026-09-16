@@ -134,6 +134,7 @@ Dockerfile과 Docker Compose 시작 설정은 database migration을 자동으로
 8. `AddSessionMetadataMigration`
 9. `IndexSessionUserExpiryMigration`
 10. `CreateAuditLogMigration`
+11. `IndexMaintenanceExpiryMigration`
 
 `AddEmailVerificationMigration`은 사용자 이메일 인증 상태와 이메일 인증 토큰 테이블을 추가합니다.
 
@@ -149,6 +150,8 @@ Dockerfile과 Docker Compose 시작 설정은 database migration을 자동으로
 재시도와 rollback에 관한 내용은 [세션 관리 배포 문서](docs/session-management.md#railway-migration)를 참고하세요.
 
 테스트는 별도의 PostgreSQL 데이터베이스를 사용하며 개발 DB에는 migration을 적용하지 않습니다.
+
+실행 파일/모듈 이름을 변경한 뒤에는 배포 전 원격 migration 이력을 확인해야 합니다. [읽기 전용 점검 및 안전한 이력 이름 변경 절차](docs/deployment-rename-recovery.md)를 참고하세요.
 
 ## 인증 API
 

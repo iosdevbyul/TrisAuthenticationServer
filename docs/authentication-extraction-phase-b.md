@@ -157,9 +157,9 @@ Use the Python environment in `docs/openapi/README.md`. The server suite require
 TEST_DATABASE_* settings for disposable PostgreSQL `waktrainer_test_auth`;
 never run concurrent suites against that database. The migration compatibility
 test restores/reverts its schema. Email integration uses mocks, not Resend.
-Independent package validation may reuse the root compiler cache by adding
-`--scratch-path "$PWD/.build"` to the package commands; its package manifest and
-test target are still selected independently.
+Use the separate default build directories for server and independent package
+validation. Do not point both package roots at the same scratch directory: SwiftPM
+can reuse the wrong test build plan and report success without running server tests.
 
 Final local validation (Swift 6.3, disposable PostgreSQL, mock email):
 
