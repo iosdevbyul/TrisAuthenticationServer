@@ -134,6 +134,7 @@ The current migration registration order is:
 8. `AddSessionMetadataMigration`
 9. `IndexSessionUserExpiryMigration`
 10. `CreateAuditLogMigration`
+11. `IndexMaintenanceExpiryMigration`
 
 `AddEmailVerificationMigration` adds the user's email-verification state and the email-verification token table.
 
@@ -149,6 +150,8 @@ using session management: older code does not carry the management ID forward du
 See [session management deployment](docs/session-management.md#railway-migration) for retry and rollback details.
 
 Tests use a separate PostgreSQL database and do not migrate the development database.
+
+Executable/module renames require reviewing the remote migration ledger before deployment. See the [read-only inventory and guarded history-rename procedure](docs/deployment-rename-recovery.md).
 
 ## Authentication API
 

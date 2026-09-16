@@ -17,7 +17,7 @@ jobs:
           cache-dependency-path: scripts/openapi-requirements.txt
       - run: pip install -r scripts/openapi-requirements.txt
       - run: python scripts/openapi.py --check
-      - run: python -m unittest discover -s scripts -p 'test_openapi.py'
+      - run: python -m unittest discover -s scripts -p 'test_*.py'
 
   swift:
     runs-on: ubuntu-latest
@@ -41,7 +41,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: swift build
-      - run: swift build --package-path Packages/AuthenticationServerKit --scratch-path "$GITHUB_WORKSPACE/.build"
+      # Distinct SwiftPM roots must not share build plans/test discovery caches.
+      - run: swift build --package-path Packages/AuthenticationServerKit
       # Both integration suites use the same disposable database, in sequence.
-      - run: swift test --package-path Packages/AuthenticationServerKit --scratch-path "$GITHUB_WORKSPACE/.build" --no-parallel
+      - run: swift test --package-path Packages/AuthenticationServerKit --no-parallel
       - run: swift test --no-parallel
