@@ -30,11 +30,11 @@ RUN mkdir /staging
 # N.B.: The static version of jemalloc is incompatible with the static Swift runtime.
 RUN --mount=type=cache,id=s/ad266e37-8fca-4eb2-896c-9ad26870a6d2-/build/.build,target=/build/.build \
     swift build -c release \
-        --product WakTrainerServer \
+        --product TrisAuthenticationServer \
         --static-swift-stdlib \
         -Xlinker -ljemalloc && \
     # Copy main executable to staging area
-    cp "$(swift build -c release --show-bin-path)/WakTrainerServer" /staging && \
+    cp "$(swift build -c release --show-bin-path)/TrisAuthenticationServer" /staging && \
     # Copy resources bundled by SPM to staging area
     find -L "$(swift build -c release --show-bin-path)" -regex '.*\.resources$' -exec cp -Ra {} /staging \;
 
@@ -88,5 +88,5 @@ USER vapor:vapor
 EXPOSE 8080
 
 # Start the Vapor service when the image is run, default to listening on 8080 in production environment
-ENTRYPOINT ["./WakTrainerServer"]
+ENTRYPOINT ["./TrisAuthenticationServer"]
 CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]

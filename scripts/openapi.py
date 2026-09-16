@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / 'Sources/WakTrainerServer'
+SOURCE = ROOT / 'Sources/TrisAuthenticationServer'
 PACKAGE_SOURCE = ROOT / 'Packages/AuthenticationServerKit/Sources/AuthenticationServerKit'
 OUTPUT = ROOT / 'docs/openapi/openapi.json'
 
@@ -123,7 +123,7 @@ def generate():
     assert seen == set(metadata), 'Operation metadata and registered routes differ'
     paths['/hello'] = {'get':dict(operationId='hello',summary='Public greeting',description='Returns the plain-text greeting.',security=[],responses={'200':dict(description='Success',content={'text/plain':{'schema':{'type':'string'}}})})}
     paths['/hello']['get']['responses']['413'] = dict(description='PAYLOAD_TOO_LARGE (streamed request body exceeds collection limit)', content={'application/json':dict(schema=ref('APIErrorResponseDTO'))})
-    return dict(openapi='3.0.3',info=dict(title='WakTrainerServer public API',version='1.0.0',description='Contract baseline before AuthenticationServerKit extraction. Generated without running the server. JSON is the primary client format; current Vapor default form and JSON API decoders are also accepted. No query parameters are consumed. Unknown paths/methods return 404 NOT_FOUND using APIErrorResponseDTO. Infrastructure/proxy responses are outside this application contract.'),paths=paths,components=dict(schemas=schemas,securitySchemes={'bearerAuth':dict(type='http',scheme='bearer',bearerFormat='JWT',description='JWT sub, exp and sid are validated together with the active database session. Email verification is not required for current protected routes.')}))
+    return dict(openapi='3.0.3',info=dict(title='TrisAuthenticationServer public API',version='1.0.0',description='Contract baseline before AuthenticationServerKit extraction. Generated without running the server. JSON is the primary client format; current Vapor default form and JSON API decoders are also accepted. No query parameters are consumed. Unknown paths/methods return 404 NOT_FOUND using APIErrorResponseDTO. Infrastructure/proxy responses are outside this application contract.'),paths=paths,components=dict(schemas=schemas,securitySchemes={'bearerAuth':dict(type='http',scheme='bearer',bearerFormat='JWT',description='JWT sub, exp and sid are validated together with the active database session. Email verification is not required for current protected routes.')}))
 
 
 def validate(document):

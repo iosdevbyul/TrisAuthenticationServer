@@ -64,14 +64,14 @@ successful bounded run, not a failure. Monitor repeated caps and adjust the sche
 Apply schema migrations first, then run cleanup:
 
 ```sh
-swift run WakTrainerServer migrate --yes
-swift run WakTrainerServer maintenance
+swift run TrisAuthenticationServer migrate --yes
+swift run TrisAuthenticationServer maintenance
 ```
 
 For the built production image:
 
 ```sh
-./WakTrainerServer maintenance --env production
+./TrisAuthenticationServer maintenance --env production
 ```
 
 The existing `DATABASE_*` settings and `JWT_SECRET` remain required by common application configuration.
@@ -81,11 +81,11 @@ arguments or logs. The maintenance command closes application/database resources
 ## Railway production
 
 1. Keep the web service's existing pre-deploy command:
-   `./WakTrainerServer migrate --env production --yes`.
+   `./TrisAuthenticationServer migrate --env production --yes`.
 2. Create a separate Cron service from the same repository/Docker image and private PostgreSQL network.
    Reuse the database variable references and required common configuration. Do not expose a public
    HTTP domain or configure a web health check for this service.
-3. Set its **Start Command** to `./WakTrainerServer maintenance --env production`.
+3. Set its **Start Command** to `./TrisAuthenticationServer maintenance --env production`.
    This is Railway's full [Start Command override](https://docs.railway.com/deployments/start-command). For a direct `docker run` using this image's existing
    executable ENTRYPOINT, pass only `maintenance --env production` as the container arguments.
 4. Set **Cron Schedule** to `0 * * * *` (hourly, UTC). Configure restart policy **Never** so failure is

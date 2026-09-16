@@ -1,7 +1,7 @@
 @testable import AuthenticationServerKit
 import Foundation
 import Vapor
-@testable import WakTrainerServer
+@testable import TrisAuthenticationServer
 
 final class MockEmailService: EmailSending, @unchecked Sendable {
     private let lock = NSLock()

@@ -169,7 +169,7 @@ revert는 audit 테이블을 삭제하여 이력을 잃으므로 운영에서는
 Railway 기존 pre-deploy 명령:
 
 ```sh
-./WakTrainerServer migrate --env production --yes
+./TrisAuthenticationServer migrate --env production --yes
 ```
 
 새 코드 실행 전에 migration을 완료하고 AUDIT_HASH_KEY를 운영 환경에 설정한다.

@@ -1,8 +1,8 @@
-# WakTrainerServer
+# TrisAuthenticationServer
 
 [English](README.md) | **한국어**
 
-WakTrainerServer는 Vapor, Swift 6.3, PostgreSQL 기반의 인증 백엔드 서버입니다.
+TrisAuthenticationServer는 Vapor, Swift 6.3, PostgreSQL 기반의 인증 백엔드 서버입니다.
 
 현재 다음 기능을 지원합니다.
 
@@ -90,13 +90,13 @@ docker compose up -d db
 Migration 적용:
 
 ```sh
-swift run WakTrainerServer migrate --yes
+swift run TrisAuthenticationServer migrate --yes
 ```
 
 서버 실행:
 
 ```sh
-swift run WakTrainerServer serve --hostname 127.0.0.1 --port 8080
+swift run TrisAuthenticationServer serve --hostname 127.0.0.1 --port 8080
 ```
 
 `.env`의 `DATABASE_PASSWORD`를 변경해도 기존 PostgreSQL Docker volume에 저장된 비밀번호가 자동으로 변경되지는 않습니다.
@@ -587,7 +587,7 @@ Mock 이메일 테스트는 실제 수신함 도착 여부를 검증하지 않�
 
 ## 운영 배포
 
-WakTrainerServer는 현재 Railway에 배포되어 있습니다.
+TrisAuthenticationServer는 현재 Railway에 배포되어 있습니다.
 
 현재 운영 구조:
 
@@ -601,7 +601,7 @@ WakTrainerServer는 현재 Railway에 배포되어 있습니다.
 운영 migration은 Railway pre-deploy command로 실행합니다.
 
 ```sh
-./WakTrainerServer migrate --env production --yes
+./TrisAuthenticationServer migrate --env production --yes
 ```
 
 애플리케이션은 현재 Railway private network를 통해 PostgreSQL에 연결하며, 애플리케이션 레벨에서 PostgreSQL TLS는 비활성화되어 있습니다.
@@ -642,7 +642,7 @@ AUDIT_HASH_KEY
 ## Database Maintenance
 
 웹 서비스에서 migration을 적용한 뒤 별도 Railway Cron 서비스의 시작 명령을
-`./WakTrainerServer maintenance --env production`, 주기를 `0 * * * *`(UTC 매시간)로 설정합니다.
+`./TrisAuthenticationServer maintenance --env production`, 주기를 `0 * * * *`(UTC 매시간)로 설정합니다.
 동일 binary가 만료된 세션·토큰·rate limit과 오래된 audit log를 batch당 500개, 테이블당 최대
 20 batch로 정리합니다. `AUDIT_RETENTION_DAYS` 기본값은 90이며 90 미만은 거부합니다.
 기존 lazy cleanup은 유지합니다. 일부 대상이 실패해도 나머지는 시도한 후 실패 종료합니다.

@@ -1,8 +1,8 @@
-# WakTrainerServer
+# TrisAuthenticationServer
 
 **English** | [한국어](README.ko.md)
 
-WakTrainerServer is an authentication backend built with Vapor, Swift 6.3, and PostgreSQL.
+TrisAuthenticationServer is an authentication backend built with Vapor, Swift 6.3, and PostgreSQL.
 
 It currently supports:
 
@@ -90,13 +90,13 @@ docker compose up -d db
 Apply migrations:
 
 ```sh
-swift run WakTrainerServer migrate --yes
+swift run TrisAuthenticationServer migrate --yes
 ```
 
 Start the server:
 
 ```sh
-swift run WakTrainerServer serve --hostname 127.0.0.1 --port 8080
+swift run TrisAuthenticationServer serve --hostname 127.0.0.1 --port 8080
 ```
 
 Changing `DATABASE_PASSWORD` in `.env` does not automatically update credentials stored in an existing PostgreSQL Docker volume.
@@ -590,7 +590,7 @@ Mock delivery tests do not verify actual inbox delivery.
 
 ## Production deployment
 
-WakTrainerServer is currently deployed on Railway.
+TrisAuthenticationServer is currently deployed on Railway.
 
 Current production architecture:
 
@@ -604,7 +604,7 @@ Current production architecture:
 Production migrations run as a Railway pre-deploy command:
 
 ```sh
-./WakTrainerServer migrate --env production --yes
+./TrisAuthenticationServer migrate --env production --yes
 ```
 
 The application currently connects to Railway PostgreSQL over the private network with PostgreSQL TLS disabled at the application layer.
@@ -644,7 +644,7 @@ Additional documentation:
 
 ## Database Maintenance
 
-Run `./WakTrainerServer maintenance --env production` in a separate Railway Cron service with
+Run `./TrisAuthenticationServer maintenance --env production` in a separate Railway Cron service with
 schedule `0 * * * *` (hourly UTC), after the web service applies migrations. The same binary cleans
 expired session/token/rate-limit rows and old audit logs in batches of 500, at most 20 batches per
 table. `AUDIT_RETENTION_DAYS` defaults to 90; values below 90 are rejected. Existing lazy cleanup

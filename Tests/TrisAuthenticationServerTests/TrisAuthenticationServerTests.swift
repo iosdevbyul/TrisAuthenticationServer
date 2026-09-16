@@ -1,10 +1,10 @@
 @testable import AuthenticationServerKit
-@testable import WakTrainerServer
+@testable import TrisAuthenticationServer
 import VaporTesting
 import Testing
 
 @Suite("App Tests")
-struct WakTrainerServerTests {
+struct TrisAuthenticationServerTests {
     @Test("Public route and protected routes without authentication")
     func routesWithoutAuthentication() async throws {
         try await withApp(configure: { app in APIErrorMiddleware.install(on: app); try routes(app) }) { app in

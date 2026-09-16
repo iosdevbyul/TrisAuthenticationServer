@@ -1,5 +1,5 @@
 @testable import AuthenticationServerKit
-@testable import WakTrainerServer
+@testable import TrisAuthenticationServer
 import Fluent
 import SQLKit
 import JWT

@@ -34,7 +34,7 @@ the workflow does not provision Swift or PostgreSQL.
 
 ## Sources and update policy
 
-- `Sources/WakTrainerServer/DTOs/*.swift`: property types and requiredness.
+- `Sources/TrisAuthenticationServer/DTOs/*.swift`: property types and requiredness.
 - `AuthController.swift` / `SessionController.swift`: route, request/response DTO
   and current Bearer checks.
 - `APIError.swift`: complete error-code catalog and default status mapping.

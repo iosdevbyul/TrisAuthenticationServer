@@ -1,6 +1,6 @@
 //
 //  EmailService.swift
-//  WakTrainerServer
+//  TrisAuthenticationServer
 //
 //  Created by COMATOKI on 2026-09-08.
 //

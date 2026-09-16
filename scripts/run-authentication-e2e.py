@@ -43,7 +43,7 @@ def main():
             'fixture.log', input=statement, text=True)
 
     run(['swift', 'build'], 'server-build.log')
-    binary = str(server_root / '.build/debug/WakTrainerServer')
+    binary = str(server_root / '.build/debug/TrisAuthenticationServer')
     # configure.swift checks this environment's TEST_DATABASE_NAME before connecting.
     run([binary, 'migrate', '--env', 'testing', '--yes'], 'migrate.log')
     server_log = (artifacts / 'server.log').open('w')

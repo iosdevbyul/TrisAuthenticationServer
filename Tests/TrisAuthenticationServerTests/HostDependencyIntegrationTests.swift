@@ -1,4 +1,4 @@
-@testable import WakTrainerServer
+@testable import TrisAuthenticationServer
 @testable import AuthenticationServerKit
 import Fluent
 import SQLKit

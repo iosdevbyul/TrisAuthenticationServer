@@ -1,5 +1,5 @@
 @testable import AuthenticationServerKit
-@testable import WakTrainerServer
+@testable import TrisAuthenticationServer
 import Vapor
 
 // Existing integration fixtures retain explicit URL/transport overrides.

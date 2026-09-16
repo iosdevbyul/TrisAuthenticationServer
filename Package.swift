@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "WakTrainerServer",
+    name: "TrisAuthenticationServer",
     platforms: [
        .macOS(.v13)
     ],
@@ -37,7 +37,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "WakTrainerServer",
+            name: "TrisAuthenticationServer",
             dependencies: [
                 .product(name: "AuthenticationServerKit", package: "AuthenticationServerKit"),
                 .product(name: "VaporToOpenAPI", package: "VaporToOpenAPI"),
@@ -52,9 +52,9 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .testTarget(
-            name: "WakTrainerServerTests",
+            name: "TrisAuthenticationServerTests",
             dependencies: [
-                .target(name: "WakTrainerServer"),
+                .target(name: "TrisAuthenticationServer"),
                 .product(name: "AuthenticationServerKit", package: "AuthenticationServerKit"),
                 .product(name: "VaporTesting", package: "vapor"),
             ],

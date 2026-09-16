@@ -1,14 +1,14 @@
 # AuthenticationKit Demo server integration
 
-The Demo uses the local AuthenticationKit package and TrisNetworkKit 0.1.0. All E2E requests use the real `URLSessionNetworkClient`, `AuthorizationRequestInterceptor`, WakTrainerServer routes, Fluent, and PostgreSQL. No mock repository or email replacement is installed in the E2E server.
+The Demo uses the local AuthenticationKit package and TrisNetworkKit 0.1.0. All E2E requests use the real `URLSessionNetworkClient`, `AuthorizationRequestInterceptor`, TrisAuthenticationServer routes, Fluent, and PostgreSQL. No mock repository or email replacement is installed in the E2E server.
 
 ## Safe local execution
 
 Prerequisites: Xcode with an available iOS 17+ simulator, running Docker PostgreSQL, and a dedicated database named exactly `waktrainer_test_auth`. Keep `TEST_DATABASE_NAME`, `TEST_DATABASE_HOST`, `TEST_DATABASE_PORT`, `TEST_DATABASE_USERNAME`, `TEST_DATABASE_PASSWORD`, `JWT_SECRET`, and mail configuration in the ignored server `.env` or process environment. Never commit that file.
 
-`WakTrainerServer --env testing` selects only `TEST_DATABASE_*` and refuses every database name except `waktrainer_test_auth`, before opening a connection. Development configuration remains unchanged.
+`TrisAuthenticationServer --env testing` selects only `TEST_DATABASE_*` and refuses every database name except `waktrainer_test_auth`, before opening a connection. Development configuration remains unchanged.
 
-From WakTrainerServer:
+From TrisAuthenticationServer:
 
 ```sh
 xcrun simctl list devices available
@@ -68,11 +68,11 @@ AuthenticationKit:
 | `Example/AuthenticationKitDemo/AuthenticationKitDemoTests/AuthenticationKitDemoTests.swift` | Replace placeholder tests with real HTTP/PostgreSQL lifecycle and reset fixture tests. |
 | `Example/AuthenticationKitDemo/AuthenticationKitDemoUITests/AuthenticationKitDemoUITests.swift` | Exercise the actual Demo screens and wait for success callbacks. |
 
-WakTrainerServer:
+TrisAuthenticationServer:
 
 | File | Reason |
 | --- | --- |
-| `Sources/WakTrainerServer/configure.swift` | Make the actual server's testing environment use only the explicitly named test DB. |
+| `Sources/TrisAuthenticationServer/configure.swift` | Make the actual server's testing environment use only the explicitly named test DB. |
 | `scripts/run-authentication-e2e.py` | Reproducibly build, run, seed, test, and clean up an isolated E2E server. |
 | `docs/authentication-e2e.md` | Document execution, actual coverage, mail limitations, and changes. |
 
