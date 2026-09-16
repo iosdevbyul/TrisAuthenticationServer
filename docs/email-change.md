@@ -108,7 +108,7 @@ EMAIL_CHANGE_URL_BASE=https://your-frontend.example/change-email
 Railway production pre-deploy 명령은 그대로 사용한다.
 
 ```sh
-./WakTrainerServer migrate --env production --yes
+./TrisAuthenticationServer migrate --env production --yes
 ```
 
 새 빈 테이블과 해당 테이블의 UNIQUE 인덱스/FK만 생성한다.

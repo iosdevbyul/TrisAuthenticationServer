@@ -93,7 +93,7 @@ refresh에서 소비한 이전 행은 기존처럼 즉시 삭제하므로 사용
 환경변수 추가는 없다. 기존 pre-deploy 명령을 유지한다.
 
 ```sh
-./WakTrainerServer migrate --env production --yes
+./TrisAuthenticationServer migrate --env production --yes
 ```
 
 기존 migration 뒤에 다음을 순서대로 적용한다.
