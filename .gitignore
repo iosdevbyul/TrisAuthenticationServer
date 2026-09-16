@@ -14,3 +14,5 @@ default.profraw
 
 # Local OpenAPI Python tooling
 __pycache__/
+
+.build-server/

@@ -20,19 +20,21 @@ struct AuthIntegrationTests {
     @Test
     func accountLifecycle() async throws {
         let emailService = MockEmailService()
-        try await withApp(configure: { app in
+        try await withAuthenticationTestApp(configure: { app in
             APIErrorMiddleware.install(on: app)
             // Application.make loads .env before this closure runs.
             // Missing or unsafe configuration must fail instead of silently skipping.
             let name = try #require(Environment.get("TEST_DATABASE_NAME"))
             try #require(name == "waktrainer_test_auth")
+            // Lock-race fixtures need three simultaneous connections even on one loop:
+            // the lock holder, the blocked auth transaction, and the lock observer.
             app.databases.use(.postgres(configuration: .init(
                 hostname: Environment.get("TEST_DATABASE_HOST") ?? "127.0.0.1",
                 port: Environment.get("TEST_DATABASE_PORT").flatMap(Int.init) ?? 5432,
                 username: Environment.get("TEST_DATABASE_USERNAME") ?? "vapor",
                 password: Environment.get("TEST_DATABASE_PASSWORD"),
                 database: name, tls: .disable
-            )), as: .psql)
+            ), maxConnectionsPerEventLoop: 3), as: .psql)
             app.databases.use(.postgres(configuration: .init(
                 hostname: Environment.get("TEST_DATABASE_HOST") ?? "127.0.0.1",
                 port: Environment.get("TEST_DATABASE_PORT").flatMap(Int.init) ?? 5432,
@@ -95,6 +97,7 @@ struct AuthIntegrationTests {
             #expect(try await RefreshToken.find(legacySessionID, on: app.db) != nil)
             try await legacyUser.delete(on: app.db)
         }) { app in
+            try await verifyTransactionFixtureRollback(app)
             // Valid forgot-password requests query the database, even for unknown users.
             let forgot = try await request(app, .POST, "forgot-password", body: [
                 "email": UUID().uuidString + "@example.com"
@@ -180,7 +183,6 @@ struct AuthIntegrationTests {
             try await verifyAuditLogging(app, emailService: emailService)
             try await verifyMaintenance(app, emailService: emailService)
             try await verifyHostDependencies(app)
-            try await app.autoRevert()
         }
     }
     private func verifyPasswordReset(_ app: Application, emailService: MockEmailService) async throws {

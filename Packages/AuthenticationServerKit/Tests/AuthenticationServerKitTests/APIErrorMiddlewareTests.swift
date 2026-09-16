@@ -36,8 +36,9 @@ struct APIErrorMiddlewareTests {
             }
             app.get("raw-status") { _ -> String in throw Abort(.imATeapot, reason: secret) }
             app.post("decode") { req -> String in _ = try req.content.decode(AuthRequestDTO.self); return "ok" }
+            let tester = try app.testing()
             for code in APIErrorCode.allCases {
-                let response = try await app.sendRequest(.GET, "typed/" + code.rawValue)
+                let response = try await tester.sendRequest(.GET, "typed/" + code.rawValue)
                 let payload = try response.content.decode(APIErrorResponseDTO.self)
                 #expect(response.status == code.status)
                 #expect(payload.status == response.status.code)
@@ -50,7 +51,7 @@ struct APIErrorMiddlewareTests {
                 #expect(try response.content.decode(Legacy.self).reason == payload.message)
             }
             for path in ["raw-abort", "raw-client-abort", "raw-debuggable", "raw-unexpected", "raw-decoder", "raw-headers", "raw-status", "missing"] {
-                let response = try await app.sendRequest(.GET, path, beforeRequest: { req in
+                let response = try await tester.sendRequest(.GET, path, beforeRequest: { req in
                     req.headers.bearerAuthorization = .init(token: "private-access")
                 })
                 let payload = try response.content.decode(APIErrorResponseDTO.self)
@@ -69,7 +70,7 @@ struct APIErrorMiddlewareTests {
                 if path == "raw-decoder" || path == "raw-client-abort" { #expect(payload.code == .invalidRequest) }
             }
             for body in ["{", "{}", "{\"email\":123,\"password\":\"private-password\"}"] {
-                let response = try await app.sendRequest(.POST, "decode", beforeRequest: { req in
+                let response = try await tester.sendRequest(.POST, "decode", beforeRequest: { req in
                     req.headers.contentType = .json
                     req.body = .init(string: body)
                 })
@@ -77,10 +78,10 @@ struct APIErrorMiddlewareTests {
                 #expect(try response.content.decode(APIErrorResponseDTO.self).code == .invalidRequest)
                 #expect(!response.body.string.contains("private-password"))
             }
-            let media = try await app.sendRequest(.POST, "decode")
+            let media = try await tester.sendRequest(.POST, "decode")
             #expect(media.status == .unsupportedMediaType)
             #expect(try media.content.decode(APIErrorResponseDTO.self).code == .unsupportedMediaType)
-            let wrongMethod = try await app.sendRequest(.DELETE, "decode")
+            let wrongMethod = try await tester.sendRequest(.DELETE, "decode")
             #expect(wrongMethod.status == .notFound)
         } catch {
             try? await app.asyncShutdown()

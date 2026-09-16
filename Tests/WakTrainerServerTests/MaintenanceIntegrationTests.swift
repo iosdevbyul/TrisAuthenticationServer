@@ -97,7 +97,7 @@ extension AuthIntegrationTests {
         for target in [DatabaseMaintenanceService.Target.loginRateLimits, .emailRateLimits] {
             let key = "maintenance-lock-" + UUID().uuidString
             try await sql.raw("INSERT INTO \(ident: target.rawValue) VALUES (\(bind: key),1,\(bind: cutoff.addingTimeInterval(-1)))").run()
-            try await app.db.transaction { tx in
+            try await withTestTransaction(on: app.db) { tx in
                 let locked = try #require(tx as? any SQLDatabase)
                 try await locked.raw("UPDATE \(ident: target.rawValue) SET expires_at = \(bind: cutoff.addingTimeInterval(3600)) WHERE bucket_key = \(bind: key)").run()
                 #expect(try await service.deleteBatch(target, on: app.db, cutoff: cutoff) == 0)
@@ -110,7 +110,7 @@ extension AuthIntegrationTests {
         let expired = RefreshToken(id: UUID(), userID: userID,
             tokenHash: AuthSession.hash(AuthSession.randomToken()), expiresAt: cutoff.addingTimeInterval(-1))
         try await expired.create(on: app.db)
-        let successor = try await app.db.transaction { tx in
+        let successor = try await withTestTransaction(on: app.db) { tx in
             let locked = try #require(tx as? any SQLDatabase)
             _ = try await locked.raw("SELECT id FROM refresh_tokens WHERE id = \(bind: expired.requireID()) FOR UPDATE SKIP LOCKED").all()
             async let cleanup = service.run(on: app.db, cutoff: cutoff, logger: quiet)
@@ -148,7 +148,7 @@ extension AuthIntegrationTests {
 
         // A table lock times out only its target; later cleanup still commits.
         try await sql.raw("INSERT INTO email_rate_limits VALUES ('maintenance-after-failure',1,\(bind: cutoff.addingTimeInterval(-1)))").run()
-        try await app.db.transaction { tx in
+        try await withTestTransaction(on: app.db) { tx in
             let locked = try #require(tx as? any SQLDatabase)
             try await locked.raw("LOCK TABLE login_rate_limits IN ACCESS EXCLUSIVE MODE").run()
             let result = await service.run(on: app.db, cutoff: cutoff, logger: quiet)

@@ -70,23 +70,37 @@ extension AuthIntegrationTests {
         let token = try #require(URLComponents(string: verificationURL)?.queryItems?.first { $0.name == "token" }?.value)
         let successesBefore = try await AuditLog.query(on: app.db)
             .filter(\.$eventType == AuditEventType.emailVerificationSucceeded.rawValue).count()
-        let task = try await app.db.transaction { db in
-            let tx = try #require(db as? any SQLDatabase)
-            try await tx.raw("DELETE FROM users WHERE id = \(bind: userID)").run()
-            let task = Task { try await client.request(.POST, "verify-email", body: ["token": token]) }
-            var waiting = false
-            for _ in 0..<100 {
-                let rows = try await sql.raw("""
-                    SELECT pid FROM pg_stat_activity WHERE datname = current_database()
-                    AND wait_event_type = 'Lock' AND query LIKE 'SELECT id FROM users WHERE id =%'
-                    """).all()
-                if !rows.isEmpty { waiting = true; break }
-                try await Task.sleep(for: .milliseconds(20))
+        let ready = TestHandoff<Void>()
+        let raced = try await withThrowingTaskGroup(of: TestingHTTPResponse.self) { group in
+            // Create the request in the test's context, and join it on every exit path.
+            group.addTask {
+                try await ready.get()
+                return try await client.request(.POST, "verify-email", body: ["token": token])
             }
-            #expect(waiting, "Verification must have passed initial token lookup and be waiting for the deleted user")
-            return task
+            do {
+                try await withTestTransaction(on: app.db) { db in
+                    let tx = try #require(db as? any SQLDatabase)
+                    try await tx.raw("DELETE FROM users WHERE id = \(bind: userID)").run()
+                    await ready.resolve(.success(()))
+                    var waiting = false
+                    for _ in 0..<100 {
+                        let rows = try await sql.raw("""
+                            SELECT pid FROM pg_stat_activity WHERE datname = current_database()
+                            AND wait_event_type = 'Lock' AND query LIKE 'SELECT id FROM users WHERE id =%'
+                            """).all()
+                        if !rows.isEmpty { waiting = true; break }
+                        try await Task.sleep(for: .milliseconds(20))
+                    }
+                    #expect(waiting, "Verification must have passed initial token lookup and be waiting for the deleted user")
+                }
+            } catch {
+                // Transaction has rolled back before joining a request waiting on its lock.
+                await ready.resolve(.failure(error))
+                group.cancelAll()
+                throw error
+            }
+            return try #require(try await group.next())
         }
-        let raced = try await task.value
         #expect(raced.status == .badRequest)
         try check(raced, .emailVerificationTokenInvalid)
         #expect(try await AuditLog.query(on: app.db)

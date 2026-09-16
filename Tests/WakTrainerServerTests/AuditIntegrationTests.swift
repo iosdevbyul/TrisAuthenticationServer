@@ -77,7 +77,7 @@ extension AuthIntegrationTests {
         let recorder = AuditLogService(hashKey: "audit-integration-fixture-key")
         let req = Request(application: app, on: app.eventLoopGroup.next())
         let marker = UUID()
-        try await app.db.transaction { db in
+        try await withTestTransaction(on: app.db) { db in
             _ = try await AuthSession.lockUser(id, on: db)
             await recorder.record(.logout, context: .init(userID: id, sessionManagementID: marker),
                 metadata: .init(endpoint: .logout, statusCode: 200), on: req)

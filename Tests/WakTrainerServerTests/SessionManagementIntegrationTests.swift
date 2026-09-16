@@ -16,7 +16,7 @@ struct SessionTestClient: Sendable {
 
     func request(_ method: HTTPMethod, _ path: String, session: SessionResponseDTO? = nil,
                  body: [String: String] = [:], device: String? = nil) async throws -> TestingHTTPResponse {
-        try await app.sendRequest(method, "auth/" + path, beforeRequest: { req in
+        try await app.testing().sendRequest(method, "auth/" + path, beforeRequest: { req in
             if let session { req.headers.bearerAuthorization = .init(token: session.accessToken) }
             if let device { req.headers.add(name: "X-Device-Name", value: device) }
             if !body.isEmpty { try req.content.encode(body) }
@@ -166,6 +166,9 @@ extension AuthIntegrationTests {
         let rawToken = AuthSession.randomToken()
         let legacy = RefreshToken(id: legacyID, userID: userID, tokenHash: AuthSession.hash(rawToken), expiresAt: Date().addingTimeInterval(3600))
         try await legacy.create(on: app.db)
+        // PostgreSQL stores microseconds; compare against the persisted source value,
+        // not the higher-precision in-memory Date generated before the INSERT.
+        let persistedCreatedAt = try #require(try await RefreshToken.find(legacyID, on: app.db)?.createdAt)
         let legacyEntry = try #require(try await client.list(owner).first { $0.id == legacyID.uuidString })
         #expect(abs(try #require(legacyEntry.startedAt).timeIntervalSince(try #require(legacy.createdAt))) < 1)
         #expect(legacyEntry.lastRefreshedAt == nil)
@@ -174,7 +177,7 @@ extension AuthIntegrationTests {
         let session = try rotated.content.decode(SessionResponseDTO.self)
         let row = try await client.stored(session)
         #expect(row.managementID == legacyID)
-        #expect(row.startedAt == legacy.createdAt)
+        #expect(row.startedAt == persistedCreatedAt)
         #expect(try await client.request(.DELETE, "sessions/" + legacyID.uuidString, session: owner).status == .ok)
         try await client.denied(session)
 
