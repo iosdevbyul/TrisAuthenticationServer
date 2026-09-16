@@ -3,7 +3,7 @@ import Fluent
 
 /// Host migration identity compatibility wrapper; retained through Phase C.
 struct AddSessionMetadataMigration: AsyncMigration {
-    var name: String { "WakTrainerServer.AddSessionMetadataMigration" }
+    var name: String { "TrisAuthenticationServer.AddSessionMetadataMigration" }
     func prepare(on database: any Database) async throws {
         try await AuthenticationMigrations.make(.addSessionMetadataMigration).prepare(on: database)
     }

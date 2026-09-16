@@ -3,7 +3,7 @@ import Fluent
 
 /// Host migration identity compatibility wrapper; retained through Phase C.
 struct AddEmailChangeMigration: AsyncMigration {
-    var name: String { "WakTrainerServer.AddEmailChangeMigration" }
+    var name: String { "TrisAuthenticationServer.AddEmailChangeMigration" }
     func prepare(on database: any Database) async throws {
         try await AuthenticationMigrations.make(.addEmailChangeMigration).prepare(on: database)
     }

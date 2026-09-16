@@ -251,14 +251,14 @@ ALTER TABLE ONLY public.password_reset_tokens
 ALTER TABLE ONLY public.refresh_tokens
     ADD CONSTRAINT refresh_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
-INSERT INTO public._fluent_migrations VALUES ('ccaa8770-ff5e-4dde-8d2e-558a5f076544', 'WakTrainerServer.CreateUserMigration', 1, '2026-09-15 04:36:25.498189+00', '2026-09-15 04:36:25.498189+00');
-INSERT INTO public._fluent_migrations VALUES ('87eb07a3-66ba-422c-bd81-9f2a577ec522', 'WakTrainerServer.CreateRefreshTokenMigration', 1, '2026-09-15 04:36:25.514767+00', '2026-09-15 04:36:25.514767+00');
-INSERT INTO public._fluent_migrations VALUES ('762b4c72-b6bf-4b3d-8448-901ecf1c680a', 'WakTrainerServer.CreateLoginRateLimitMigration', 1, '2026-09-15 04:36:25.530156+00', '2026-09-15 04:36:25.530156+00');
-INSERT INTO public._fluent_migrations VALUES ('0aed61b5-4982-4ad6-8b8a-37b90ee58302', 'WakTrainerServer.CreatePasswordResetTokenMigration', 1, '2026-09-15 04:36:25.542916+00', '2026-09-15 04:36:25.542916+00');
-INSERT INTO public._fluent_migrations VALUES ('d0493a1a-af79-41b7-9fca-b17a2b3dd7b6', 'WakTrainerServer.CreateEmailRateLimitMigration', 1, '2026-09-15 04:36:25.554684+00', '2026-09-15 04:36:25.554684+00');
-INSERT INTO public._fluent_migrations VALUES ('478b382b-0a91-497d-9117-801868406862', 'WakTrainerServer.AddEmailVerificationMigration', 1, '2026-09-15 04:36:25.57269+00', '2026-09-15 04:36:25.57269+00');
-INSERT INTO public._fluent_migrations VALUES ('5e64c98a-0be7-4d0f-afd2-8e2521925856', 'WakTrainerServer.AddEmailChangeMigration', 1, '2026-09-15 04:36:25.588035+00', '2026-09-15 04:36:25.588035+00');
-INSERT INTO public._fluent_migrations VALUES ('29c9addf-5bfd-494c-8977-fb4ed5d8f419', 'WakTrainerServer.AddSessionMetadataMigration', 1, '2026-09-15 04:36:25.595853+00', '2026-09-15 04:36:25.595853+00');
-INSERT INTO public._fluent_migrations VALUES ('b94dd90f-59ec-45a6-b7e1-513330f16f63', 'WakTrainerServer.IndexSessionUserExpiryMigration', 1, '2026-09-15 04:36:25.60472+00', '2026-09-15 04:36:25.60472+00');
-INSERT INTO public._fluent_migrations VALUES ('3a291f53-aa3b-4cde-8a89-3af72951057e', 'WakTrainerServer.CreateAuditLogMigration', 1, '2026-09-15 04:36:25.630717+00', '2026-09-15 04:36:25.630717+00');
-INSERT INTO public._fluent_migrations VALUES ('a2f8f597-14f4-409b-a411-c993a4bacc09', 'WakTrainerServer.IndexMaintenanceExpiryMigration', 1, '2026-09-15 04:36:25.655675+00', '2026-09-15 04:36:25.655675+00');
+INSERT INTO public._fluent_migrations VALUES ('ccaa8770-ff5e-4dde-8d2e-558a5f076544', 'TrisAuthenticationServer.CreateUserMigration', 1, '2026-09-15 04:36:25.498189+00', '2026-09-15 04:36:25.498189+00');
+INSERT INTO public._fluent_migrations VALUES ('87eb07a3-66ba-422c-bd81-9f2a577ec522', 'TrisAuthenticationServer.CreateRefreshTokenMigration', 1, '2026-09-15 04:36:25.514767+00', '2026-09-15 04:36:25.514767+00');
+INSERT INTO public._fluent_migrations VALUES ('762b4c72-b6bf-4b3d-8448-901ecf1c680a', 'TrisAuthenticationServer.CreateLoginRateLimitMigration', 1, '2026-09-15 04:36:25.530156+00', '2026-09-15 04:36:25.530156+00');
+INSERT INTO public._fluent_migrations VALUES ('0aed61b5-4982-4ad6-8b8a-37b90ee58302', 'TrisAuthenticationServer.CreatePasswordResetTokenMigration', 1, '2026-09-15 04:36:25.542916+00', '2026-09-15 04:36:25.542916+00');
+INSERT INTO public._fluent_migrations VALUES ('d0493a1a-af79-41b7-9fca-b17a2b3dd7b6', 'TrisAuthenticationServer.CreateEmailRateLimitMigration', 1, '2026-09-15 04:36:25.554684+00', '2026-09-15 04:36:25.554684+00');
+INSERT INTO public._fluent_migrations VALUES ('478b382b-0a91-497d-9117-801868406862', 'TrisAuthenticationServer.AddEmailVerificationMigration', 1, '2026-09-15 04:36:25.57269+00', '2026-09-15 04:36:25.57269+00');
+INSERT INTO public._fluent_migrations VALUES ('5e64c98a-0be7-4d0f-afd2-8e2521925856', 'TrisAuthenticationServer.AddEmailChangeMigration', 1, '2026-09-15 04:36:25.588035+00', '2026-09-15 04:36:25.588035+00');
+INSERT INTO public._fluent_migrations VALUES ('29c9addf-5bfd-494c-8977-fb4ed5d8f419', 'TrisAuthenticationServer.AddSessionMetadataMigration', 1, '2026-09-15 04:36:25.595853+00', '2026-09-15 04:36:25.595853+00');
+INSERT INTO public._fluent_migrations VALUES ('b94dd90f-59ec-45a6-b7e1-513330f16f63', 'TrisAuthenticationServer.IndexSessionUserExpiryMigration', 1, '2026-09-15 04:36:25.60472+00', '2026-09-15 04:36:25.60472+00');
+INSERT INTO public._fluent_migrations VALUES ('3a291f53-aa3b-4cde-8a89-3af72951057e', 'TrisAuthenticationServer.CreateAuditLogMigration', 1, '2026-09-15 04:36:25.630717+00', '2026-09-15 04:36:25.630717+00');
+INSERT INTO public._fluent_migrations VALUES ('a2f8f597-14f4-409b-a411-c993a4bacc09', 'TrisAuthenticationServer.IndexMaintenanceExpiryMigration', 1, '2026-09-15 04:36:25.655675+00', '2026-09-15 04:36:25.655675+00');

@@ -4,16 +4,16 @@
     "docs/openapi/operations.json": "003cf32972dd8669b70f9a57d63db84f72d13c91dd9c72600fdfe79089ca9f48"
   },
   "migrations": [
-    "WakTrainerServer.CreateUserMigration",
-    "WakTrainerServer.CreateRefreshTokenMigration",
-    "WakTrainerServer.CreateLoginRateLimitMigration",
-    "WakTrainerServer.CreatePasswordResetTokenMigration",
-    "WakTrainerServer.CreateEmailRateLimitMigration",
-    "WakTrainerServer.AddEmailVerificationMigration",
-    "WakTrainerServer.AddEmailChangeMigration",
-    "WakTrainerServer.AddSessionMetadataMigration",
-    "WakTrainerServer.IndexSessionUserExpiryMigration",
-    "WakTrainerServer.CreateAuditLogMigration",
-    "WakTrainerServer.IndexMaintenanceExpiryMigration"
+    "TrisAuthenticationServer.CreateUserMigration",
+    "TrisAuthenticationServer.CreateRefreshTokenMigration",
+    "TrisAuthenticationServer.CreateLoginRateLimitMigration",
+    "TrisAuthenticationServer.CreatePasswordResetTokenMigration",
+    "TrisAuthenticationServer.CreateEmailRateLimitMigration",
+    "TrisAuthenticationServer.AddEmailVerificationMigration",
+    "TrisAuthenticationServer.AddEmailChangeMigration",
+    "TrisAuthenticationServer.AddSessionMetadataMigration",
+    "TrisAuthenticationServer.IndexSessionUserExpiryMigration",
+    "TrisAuthenticationServer.CreateAuditLogMigration",
+    "TrisAuthenticationServer.IndexMaintenanceExpiryMigration"
   ]
 }
