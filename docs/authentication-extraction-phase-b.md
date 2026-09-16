@@ -1,8 +1,8 @@
 # AuthenticationServerKit extraction: Phase B
 
 Phase B extracts implementation; `AuthController`, `SessionController`, route
-registration, application setup and production tooling remain in WakTrainerServer.
-The dependency remains `WakTrainerServer -> AuthenticationServerKit`. Neither the
+registration, application setup and production tooling remain in TrisAuthenticationServer.
+The dependency remains `TrisAuthenticationServer -> AuthenticationServerKit`. Neither the
 server nor the iOS AuthenticationKit is imported/referenced by package sources.
 No API contract, schema, historical migration identity or registration order is
 changed. No commit, push, production database access or external email delivery
@@ -90,7 +90,7 @@ The temporary convenience overloads can be removed when Phase C explicitly
 composes package services. Environment parsing/IP trust configuration must remain
 host-owned even after those overloads are removed.
 
-All eleven host migration wrappers retain explicit `WakTrainerServer.<Name>`
+All eleven host migration wrappers retain explicit `TrisAuthenticationServer.<Name>`
 identities and delegate prepare/revert to the package. The existing
 `AuthenticationMigrationBaseline.migrations()` list and configure registration are
 unchanged. These identity wrappers must not be removed or double-registered as
@@ -135,7 +135,7 @@ No schema, component, operation ID, response or expected output was changed.
 
 | File | Unchanged SHA-256 |
 | --- | --- |
-| docs/openapi/openapi.json | `232af101692ad6bbf9d07bc52d6b6886edb9a915a7a750516b5496d974d75a3d` |
+| docs/openapi/openapi.json | `6cd827d29d80446fa69e39c421c0825272faf52ce45fe13b3be854c9d99cc12b` |
 | docs/openapi/operations.json | `003cf32972dd8669b70f9a57d63db84f72d13c91dd9c72600fdfe79089ca9f48` |
 
 OpenAPI 3.0.3 validation, reference resolution and generated-current-output check
@@ -252,65 +252,65 @@ A	Packages/AuthenticationServerKit/Tests/AuthenticationServerKitTests/ServiceBou
 A	Packages/AuthenticationServerKit/Tests/AuthenticationServerKitTests/SessionMetadataTests.swift
 M	README.ko.md
 M	README.md
-D	Sources/WakTrainerServer/Audit/AuditEvent.swift
-D	Sources/WakTrainerServer/Audit/AuditLogMiddleware.swift
-D	Sources/WakTrainerServer/Audit/AuditLogService.swift
-D	Sources/WakTrainerServer/Auth/AccessTokenPayload.swift
-D	Sources/WakTrainerServer/Auth/AuthSession.swift
-D	Sources/WakTrainerServer/Auth/LoginRateLimiter.swift
-A	Sources/WakTrainerServer/Configuration/AuthenticationServiceAdapters.swift
-M	Sources/WakTrainerServer/Controllers/AuthController.swift
-M	Sources/WakTrainerServer/Controllers/SessionController.swift
-D	Sources/WakTrainerServer/DTOs/APIErrorResponseDTO.swift
-D	Sources/WakTrainerServer/DTOs/AuthDTOs.swift
-D	Sources/WakTrainerServer/DTOs/ResetPasswordRequestDTO.swift
-D	Sources/WakTrainerServer/DTOs/SessionManagementDTOs.swift
-D	Sources/WakTrainerServer/Errors/APIError.swift
-M	Sources/WakTrainerServer/Middleware/APIErrorMiddleware.swift
-M	Sources/WakTrainerServer/Migrations/AddEmailChangeMigration.swift
-M	Sources/WakTrainerServer/Migrations/AddEmailVerificationMigration.swift
-M	Sources/WakTrainerServer/Migrations/AddSessionMetadataMigration.swift
-M	Sources/WakTrainerServer/Migrations/CreateAuditLogMigration.swift
-M	Sources/WakTrainerServer/Migrations/CreateEmailRateLimitMigration.swift
-M	Sources/WakTrainerServer/Migrations/CreateLoginRateLimitMigration.swift
-M	Sources/WakTrainerServer/Migrations/CreatePasswordResetTokenMigration.swift
-M	Sources/WakTrainerServer/Migrations/CreateRefreshTokenMigration.swift
-M	Sources/WakTrainerServer/Migrations/CreateUserMigration.swift
-M	Sources/WakTrainerServer/Migrations/IndexMaintenanceExpiryMigration.swift
-M	Sources/WakTrainerServer/Migrations/IndexSessionUserExpiryMigration.swift
-D	Sources/WakTrainerServer/Models/AuditLog.swift
-D	Sources/WakTrainerServer/Models/EmailChangeToken.swift
-D	Sources/WakTrainerServer/Models/EmailVerificationToken.swift
-D	Sources/WakTrainerServer/Models/PasswordResetToken.swift
-D	Sources/WakTrainerServer/Models/RefreshToken.swift
-D	Sources/WakTrainerServer/Models/User.swift
-M	Sources/WakTrainerServer/Services/DatabaseMaintenanceService.swift
-D	Sources/WakTrainerServer/Services/EmailChangeService.swift
-D	Sources/WakTrainerServer/Services/EmailRateLimitService.swift
-M	Sources/WakTrainerServer/Services/EmailService.swift
-D	Sources/WakTrainerServer/Services/EmailVerificationService.swift
+D	Sources/TrisAuthenticationServer/Audit/AuditEvent.swift
+D	Sources/TrisAuthenticationServer/Audit/AuditLogMiddleware.swift
+D	Sources/TrisAuthenticationServer/Audit/AuditLogService.swift
+D	Sources/TrisAuthenticationServer/Auth/AccessTokenPayload.swift
+D	Sources/TrisAuthenticationServer/Auth/AuthSession.swift
+D	Sources/TrisAuthenticationServer/Auth/LoginRateLimiter.swift
+A	Sources/TrisAuthenticationServer/Configuration/AuthenticationServiceAdapters.swift
+M	Sources/TrisAuthenticationServer/Controllers/AuthController.swift
+M	Sources/TrisAuthenticationServer/Controllers/SessionController.swift
+D	Sources/TrisAuthenticationServer/DTOs/APIErrorResponseDTO.swift
+D	Sources/TrisAuthenticationServer/DTOs/AuthDTOs.swift
+D	Sources/TrisAuthenticationServer/DTOs/ResetPasswordRequestDTO.swift
+D	Sources/TrisAuthenticationServer/DTOs/SessionManagementDTOs.swift
+D	Sources/TrisAuthenticationServer/Errors/APIError.swift
+M	Sources/TrisAuthenticationServer/Middleware/APIErrorMiddleware.swift
+M	Sources/TrisAuthenticationServer/Migrations/AddEmailChangeMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/AddEmailVerificationMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/AddSessionMetadataMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/CreateAuditLogMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/CreateEmailRateLimitMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/CreateLoginRateLimitMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/CreatePasswordResetTokenMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/CreateRefreshTokenMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/CreateUserMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/IndexMaintenanceExpiryMigration.swift
+M	Sources/TrisAuthenticationServer/Migrations/IndexSessionUserExpiryMigration.swift
+D	Sources/TrisAuthenticationServer/Models/AuditLog.swift
+D	Sources/TrisAuthenticationServer/Models/EmailChangeToken.swift
+D	Sources/TrisAuthenticationServer/Models/EmailVerificationToken.swift
+D	Sources/TrisAuthenticationServer/Models/PasswordResetToken.swift
+D	Sources/TrisAuthenticationServer/Models/RefreshToken.swift
+D	Sources/TrisAuthenticationServer/Models/User.swift
+M	Sources/TrisAuthenticationServer/Services/DatabaseMaintenanceService.swift
+D	Sources/TrisAuthenticationServer/Services/EmailChangeService.swift
+D	Sources/TrisAuthenticationServer/Services/EmailRateLimitService.swift
+M	Sources/TrisAuthenticationServer/Services/EmailService.swift
+D	Sources/TrisAuthenticationServer/Services/EmailVerificationService.swift
 A	Tests/Baselines/pre-extraction-schema.sql
-M	Tests/WakTrainerServerTests/APIErrorIntegrationTests.swift
-M	Tests/WakTrainerServerTests/APIErrorMiddlewareTests.swift
-M	Tests/WakTrainerServerTests/AccessTokenTests.swift
-M	Tests/WakTrainerServerTests/AuditDeduplicationTests.swift
-M	Tests/WakTrainerServerTests/AuditIntegrationTests.swift
-M	Tests/WakTrainerServerTests/AuthIntegrationTests.swift
-M	Tests/WakTrainerServerTests/EmailChangeIntegrationTests.swift
-M	Tests/WakTrainerServerTests/EmailVerificationIntegrationTests.swift
-M	Tests/WakTrainerServerTests/ExtractionBaselineTests.swift
-M	Tests/WakTrainerServerTests/HostDependencyBoundaryTests.swift
-M	Tests/WakTrainerServerTests/HostDependencyIntegrationTests.swift
-M	Tests/WakTrainerServerTests/MaintenanceIntegrationTests.swift
-M	Tests/WakTrainerServerTests/MaintenancePolicyTests.swift
-A	Tests/WakTrainerServerTests/MigrationCompatibilityTests.swift
-M	Tests/WakTrainerServerTests/MockEmailService.swift
-M	Tests/WakTrainerServerTests/OpenAPIContractTests.swift
-M	Tests/WakTrainerServerTests/SessionConcurrencyTests.swift
-M	Tests/WakTrainerServerTests/SessionManagementIntegrationTests.swift
-M	Tests/WakTrainerServerTests/SessionMetadataTests.swift
-M	Tests/WakTrainerServerTests/SessionMigrationTests.swift
-M	Tests/WakTrainerServerTests/WakTrainerServerTests.swift
+M	Tests/TrisAuthenticationServerTests/APIErrorIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/APIErrorMiddlewareTests.swift
+M	Tests/TrisAuthenticationServerTests/AccessTokenTests.swift
+M	Tests/TrisAuthenticationServerTests/AuditDeduplicationTests.swift
+M	Tests/TrisAuthenticationServerTests/AuditIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/AuthIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/EmailChangeIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/EmailVerificationIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/ExtractionBaselineTests.swift
+M	Tests/TrisAuthenticationServerTests/HostDependencyBoundaryTests.swift
+M	Tests/TrisAuthenticationServerTests/HostDependencyIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/MaintenanceIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/MaintenancePolicyTests.swift
+A	Tests/TrisAuthenticationServerTests/MigrationCompatibilityTests.swift
+M	Tests/TrisAuthenticationServerTests/MockEmailService.swift
+M	Tests/TrisAuthenticationServerTests/OpenAPIContractTests.swift
+M	Tests/TrisAuthenticationServerTests/SessionConcurrencyTests.swift
+M	Tests/TrisAuthenticationServerTests/SessionManagementIntegrationTests.swift
+M	Tests/TrisAuthenticationServerTests/SessionMetadataTests.swift
+M	Tests/TrisAuthenticationServerTests/SessionMigrationTests.swift
+M	Tests/TrisAuthenticationServerTests/TrisAuthenticationServerTests.swift
 A	docs/authentication-extraction-phase-b.md
 M	scripts/openapi.py
 ```

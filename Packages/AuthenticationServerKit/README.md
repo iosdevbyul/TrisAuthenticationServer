@@ -56,7 +56,7 @@ host test target deliberately uses only normal public imports.
 ## Migrations
 
 The package does not automatically register or run migrations. Existing consumers
-must retain their recorded migration identities/order. WakTrainerServer's eleven
+must retain their recorded migration identities/order. TrisAuthenticationServer's eleven
 compatibility wrappers delegate to the package and remain required. Never register
 package implementation migrations in addition to those wrappers. New hosts can
 explicitly select the steps in dependency order; this is not a schema redesign or

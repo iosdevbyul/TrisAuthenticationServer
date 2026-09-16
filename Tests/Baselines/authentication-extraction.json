@@ -1,6 +1,6 @@
 {
   "sha256": {
-    "docs/openapi/openapi.json": "232af101692ad6bbf9d07bc52d6b6886edb9a915a7a750516b5496d974d75a3d",
+    "docs/openapi/openapi.json": "6cd827d29d80446fa69e39c421c0825272faf52ce45fe13b3be854c9d99cc12b",
     "docs/openapi/operations.json": "003cf32972dd8669b70f9a57d63db84f72d13c91dd9c72600fdfe79089ca9f48"
   },
   "migrations": [

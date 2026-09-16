@@ -355,7 +355,7 @@
   },
   "info": {
     "description": "Contract baseline before AuthenticationServerKit extraction. Generated without running the server. JSON is the primary client format; current Vapor default form and JSON API decoders are also accepted. No query parameters are consumed. Unknown paths/methods return 404 NOT_FOUND using APIErrorResponseDTO. Infrastructure/proxy responses are outside this application contract.",
-    "title": "WakTrainerServer public API",
+    "title": "TrisAuthenticationServer public API",
     "version": "1.0.0"
   },
   "openapi": "3.0.3",

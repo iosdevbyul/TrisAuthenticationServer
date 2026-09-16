@@ -2,7 +2,7 @@
 
 ## Implemented boundary
 
-WakTrainerServer depends on the local `Packages/AuthenticationServerKit` product.
+TrisAuthenticationServer depends on the local `Packages/AuthenticationServerKit` product.
 The package declares configuration and Sendable closure interfaces only. No
 controller, API DTO/error, Fluent model/migration, AuthSession, rate-limit SQL,
 audit persistence or maintenance implementation moves in this phase.

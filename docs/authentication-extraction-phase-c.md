@@ -4,7 +4,7 @@ Phase C moves the HTTP layer and completes explicit package integration. The
 server's 18 operations (17 auth operations plus host-owned `/hello`), JSON/error
 contract, schema and migration history baseline remain unchanged. Authentication
 implementation has one production source in the package. There is no package
-source/test import or reference to WakTrainerServer or the iOS AuthenticationKit.
+source/test import or reference to TrisAuthenticationServer or the iOS AuthenticationKit.
 
 ## HTTP registration and host integration
 
@@ -29,7 +29,7 @@ adds exactly the existing 17 `/auth` routes, with the original individual audit
 middleware attachments. It installs no global middleware, DB, JWT keys or migrations.
 A host may register it on a grouped RoutesBuilder for an outer prefix such as `/v1`.
 
-WakTrainerServer `routes.swift` retains `/hello` and registers AuthenticationRoutes
+TrisAuthenticationServer `routes.swift` retains `/hello` and registers AuthenticationRoutes
 with its request-time Application dependency provider and registration-time audit
 key. No credentials or configuration are evaluated earlier than before extraction.
 
@@ -145,7 +145,7 @@ DTO types and real Vapor DTO encodings continue to be compared with the document
 
 | Frozen file | Unchanged SHA-256 |
 | --- | --- |
-| docs/openapi/openapi.json | `232af101692ad6bbf9d07bc52d6b6886edb9a915a7a750516b5496d974d75a3d` |
+| docs/openapi/openapi.json | `6cd827d29d80446fa69e39c421c0825272faf52ce45fe13b3be854c9d99cc12b` |
 | docs/openapi/operations.json | `003cf32972dd8669b70f9a57d63db84f72d13c91dd9c72600fdfe79089ca9f48` |
 
 The frozen extraction fixture, eleven host migration wrappers/registration order,
@@ -238,7 +238,7 @@ two iOS HTTP E2E tests pass. No extraction-scoped production implementation is l
 unmoved; the existing client UI test maintenance and remote CI/deployment are not
 performed in this task.
 
-| WakTrainerServer owns | AuthenticationServerKit owns |
+| TrisAuthenticationServer owns | AuthenticationServerKit owns |
 | --- | --- |
 | /hello and explicit app composition | 17 auth routes and controllers |
 | Provider, templates, environment, IP trust, URLs/key providers | Auth/password/email/session implementation and wire contracts |
@@ -295,18 +295,18 @@ A	Packages/AuthenticationServerKit/Tests/AuthenticationServerKitTests/APIErrorMi
 A	Packages/AuthenticationServerKit/Tests/StandaloneHostTests/StandaloneHostTests.swift
 M	README.ko.md
 M	README.md
-M	Sources/WakTrainerServer/Configuration/AuthenticationHostDependencies.swift
-M	Sources/WakTrainerServer/Configuration/AuthenticationServiceAdapters.swift
-D	Sources/WakTrainerServer/Controllers/AuthController.swift
-D	Sources/WakTrainerServer/Controllers/SessionController.swift
-M	Sources/WakTrainerServer/Middleware/APIErrorMiddleware.swift
-M	Sources/WakTrainerServer/Services/EmailService.swift
-M	Sources/WakTrainerServer/routes.swift
-D	Tests/WakTrainerServerTests/APIErrorMiddlewareTests.swift
-D	Tests/WakTrainerServerTests/AccessTokenTests.swift
-M	Tests/WakTrainerServerTests/AuthIntegrationTests.swift
-A	Tests/WakTrainerServerTests/AuthenticationTestAdapters.swift
-D	Tests/WakTrainerServerTests/SessionMetadataTests.swift
+M	Sources/TrisAuthenticationServer/Configuration/AuthenticationHostDependencies.swift
+M	Sources/TrisAuthenticationServer/Configuration/AuthenticationServiceAdapters.swift
+D	Sources/TrisAuthenticationServer/Controllers/AuthController.swift
+D	Sources/TrisAuthenticationServer/Controllers/SessionController.swift
+M	Sources/TrisAuthenticationServer/Middleware/APIErrorMiddleware.swift
+M	Sources/TrisAuthenticationServer/Services/EmailService.swift
+M	Sources/TrisAuthenticationServer/routes.swift
+D	Tests/TrisAuthenticationServerTests/APIErrorMiddlewareTests.swift
+D	Tests/TrisAuthenticationServerTests/AccessTokenTests.swift
+M	Tests/TrisAuthenticationServerTests/AuthIntegrationTests.swift
+A	Tests/TrisAuthenticationServerTests/AuthenticationTestAdapters.swift
+D	Tests/TrisAuthenticationServerTests/SessionMetadataTests.swift
 M	docs/authentication-e2e.md
 A	docs/authentication-extraction-phase-c.md
 M	scripts/openapi.py
