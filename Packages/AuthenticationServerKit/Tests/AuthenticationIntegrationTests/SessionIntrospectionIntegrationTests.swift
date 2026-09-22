@@ -21,6 +21,7 @@ extension AuthIntegrationTests {
         let json = try #require(JSONSerialization.jsonObject(with: Data(response.body.readableBytesView)) as? [String: Any])
         #expect(Set(json.keys) == ["active", "userId", "sessionId"])
         try await verifyIntrospectionSessionValidation(app)
+        try await verifyIntrospectionAccountInvalidation(app)
         try await client.clearLimits()
     }
 }
