@@ -121,5 +121,10 @@
     "summary": "Log out all sessions",
     "description": "Revokes every session including the calling session.",
     "errors": []
+  },
+  "introspect": {
+    "summary": "Validate an active session",
+    "description": "Verifies the bearer access token and its server-side session. Returns only active, userId and sessionId. Invalid, expired or removed sessions return an authentication error, never active=false.",
+    "errors": []
   }
 }

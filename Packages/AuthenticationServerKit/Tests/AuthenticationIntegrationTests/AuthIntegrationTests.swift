@@ -185,6 +185,7 @@ struct AuthIntegrationTests {
             try await verifyAPIErrorContracts(app, emailService: emailService)
             try await verifyAuditLogging(app, emailService: emailService)
             try await verifyMaintenance(app, emailService: emailService)
+            try await verifySessionIntrospection(app)
         }
     }
     private func verifyPasswordReset(_ app: Application, emailService: MockEmailService) async throws {

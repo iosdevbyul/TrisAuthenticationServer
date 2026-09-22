@@ -276,6 +276,25 @@
         ],
         "type": "object"
       },
+      "SessionIntrospectionResponseDTO": {
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "active",
+          "userId",
+          "sessionId"
+        ],
+        "type": "object"
+      },
       "SessionListResponseDTO": {
         "properties": {
           "sessions": {
@@ -1047,6 +1066,125 @@
         },
         "security": [],
         "summary": "Request password reset"
+      }
+    },
+    "/auth/introspect": {
+      "get": {
+        "description": "Verifies the bearer access token and its server-side session. Returns only active, userId and sessionId. Invalid, expired or removed sessions return an authentication error, never active=false.",
+        "operationId": "introspect",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionIntrospectionResponseDTO"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "ACCESS_TOKEN_INVALID_OR_EXPIRED",
+                            "AUTHENTICATION_REQUIRED",
+                            "SESSION_INVALID"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            401
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "ACCESS_TOKEN_INVALID_OR_EXPIRED, AUTHENTICATION_REQUIRED, SESSION_INVALID"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "PAYLOAD_TOO_LARGE"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            413
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "PAYLOAD_TOO_LARGE"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/APIErrorResponseDTO"
+                    },
+                    {
+                      "properties": {
+                        "code": {
+                          "enum": [
+                            "INTERNAL_ERROR"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            500
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "INTERNAL_ERROR"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Validate an active session"
       }
     },
     "/auth/login": {

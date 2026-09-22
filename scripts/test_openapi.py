@@ -20,8 +20,8 @@ class OpenAPIValidationTests(unittest.TestCase):
         document = generate()
         validate(document)
         paths = document['paths']
-        self.assertEqual(sum(map(len, paths.values())), 18)
-        protected = ['me','logout','withdraw','change-password','request-email-change',
+        self.assertEqual(sum(map(len, paths.values())), 19)
+        protected = ['introspect','me','logout','withdraw','change-password','request-email-change',
                      'confirm-email-change','sessions','sessions/{sessionID}',
                      'logout-other-sessions','logout-all']
         for path in protected:
@@ -29,6 +29,13 @@ class OpenAPIValidationTests(unittest.TestCase):
                 self.assertEqual(operation['security'], [{'bearerAuth':[]}])
         for path in ['signup','login','refresh','forgot-password','reset-password','verify-email','resend-verification-email']:
             self.assertEqual(paths['/auth/' + path]['post']['security'], [])
+        introspection = paths['/auth/introspect']['get']
+        self.assertIn('401', introspection['responses'])
+        self.assertEqual(introspection['responses']['200']['content']['application/json']['schema']['$ref'],
+                         '#/components/schemas/SessionIntrospectionResponseDTO')
+        schema = document['components']['schemas']['SessionIntrospectionResponseDTO']
+        self.assertEqual(set(schema['properties']), {'active', 'userId', 'sessionId'})
+        self.assertEqual(set(schema['required']), {'active', 'userId', 'sessionId'})
         self.assertIn('Retry-After', paths['/auth/login']['post']['responses']['429']['headers'])
         self.assertNotIn('headers', paths['/auth/request-email-change']['post']['responses']['429'])
         for path in ['signup','forgot-password','resend-verification-email']:

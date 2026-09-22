@@ -41,7 +41,7 @@ struct OpenAPIContractTests {
             }
             let documented = Set(paths.flatMap { path, methods in methods.keys.map { $0 + " " + path } })
             #expect(actual == documented)
-            #expect(actual.count == 18)
+            #expect(actual.count == 19)
             for (path, methods) in paths {
                 for (method, operation) in methods {
                     let security = try #require(operation["security"] as? [[String: [String]]])
@@ -130,6 +130,7 @@ struct OpenAPIContractTests {
         _ = try encoded(MessageResponseDTO(message: "ok"), schemas: schemas)
         _ = try encoded(user, schemas: schemas)
         _ = try encoded(SessionResponseDTO(user: user, accessToken: opaque, refreshToken: opaque), schemas: schemas)
+        _ = try encoded(SessionIntrospectionResponseDTO(active: true, userId: UUID().uuidString, sessionId: UUID().uuidString), schemas: schemas)
         let optional = try encoded(SessionResponseDTO(user: user, accessToken: opaque, refreshToken: nil), schemas: schemas)
         #expect(optional["refreshToken"] == nil)
         let full = ManagedSessionResponseDTO(id: UUID().uuidString, createdAt: Date(), startedAt: Date(), expiresAt: Date(), lastRefreshedAt: Date(), isCurrent: true, deviceName: "test")
