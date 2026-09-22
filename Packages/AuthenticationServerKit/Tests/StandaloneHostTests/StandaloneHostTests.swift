@@ -24,12 +24,20 @@ struct StandaloneHostTests {
                 if prefix.isEmpty { try app.register(collection: routes) }
                 else { try app.grouped(.constant(prefix)).register(collection: routes) }
             }) { app in
-                #expect(app.routes.all.count == 17)
+                #expect(app.routes.all.count == 18)
                 let base = prefix.isEmpty ? "/auth" : "/" + prefix + "/auth"
                 #expect(app.routes.all.allSatisfy { ("/" + $0.path.map(\.description).joined(separator: "/")).hasPrefix(base + "/") })
                 let protected = try await app.sendRequest(.GET, base + "/me")
                 #expect(protected.status == .unauthorized)
                 #expect(try protected.content.decode(APIErrorResponseDTO.self).code == .authenticationRequired)
+                let missingIntrospection = try await app.sendRequest(.GET, base + "/introspect")
+                #expect(missingIntrospection.status == .unauthorized)
+                #expect(try missingIntrospection.content.decode(APIErrorResponseDTO.self).code == .authenticationRequired)
+                let invalidIntrospection = try await app.sendRequest(.GET, base + "/introspect", beforeRequest: { request in
+                    request.headers.bearerAuthorization = .init(token: "invalid-jwt")
+                })
+                #expect(invalidIntrospection.status == .unauthorized)
+                #expect(try invalidIntrospection.content.decode(APIErrorResponseDTO.self).code == .accessTokenInvalidOrExpired)
                 let invalid = try await app.sendRequest(.POST, base + "/signup", beforeRequest: { request in
                     try request.content.encode(AuthRequestDTO(email: "invalid", password: "invalid"))
                 })

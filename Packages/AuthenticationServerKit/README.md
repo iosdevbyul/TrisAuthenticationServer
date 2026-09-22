@@ -20,7 +20,7 @@ let authentication = AuthenticationRoutes(
     auditHashKey: dependencies.configuration.auditHashKey()
 )
 app.middleware.use(APIErrorMiddleware()) // host chooses the installation order
-try app.register(collection: authentication) // 17 routes under /auth
+try app.register(collection: authentication) // 18 routes under /auth
 // Alternatively register on app.grouped("v1") for /v1/auth/... .
 ```
 

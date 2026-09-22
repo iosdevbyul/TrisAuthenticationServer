@@ -1,6 +1,6 @@
 import Vapor
 
-/// Explicit authentication registration. Adds the existing 17 routes under /auth.
+/// Explicit authentication registration. Adds the 18 routes under /auth.
 /// Register on a grouped RoutesBuilder to add a host-owned outer prefix.
 /// Database/JWT setup and error middleware installation remain host responsibilities.
 public struct AuthenticationRoutes: RouteCollection {

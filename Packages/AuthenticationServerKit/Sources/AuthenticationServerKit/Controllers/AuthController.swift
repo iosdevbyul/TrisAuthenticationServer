@@ -34,6 +34,7 @@ struct AuthController: RouteCollection {
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .signUpSucceeded, endpoint: .signup)).post("signup", use: signUp)
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .refreshSucceeded, endpoint: .refresh)).post("refresh", use: refresh)
         auth.get("me", use: me)
+        auth.get("introspect", use: introspect)
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .logout, endpoint: .logout)).post("logout", use: logout)
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .accountWithdrawn, endpoint: .withdraw)).delete("withdraw", use: withdraw)
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .passwordResetRequested, endpoint: .forgotPassword)).post("forgot-password", use: forgotPassword)
@@ -41,6 +42,17 @@ struct AuthController: RouteCollection {
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .passwordResetSucceeded, endpoint: .resetPassword)).post("reset-password", use: resetPassword)
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .emailVerificationSucceeded, endpoint: .verifyEmail)).post("verify-email", use: verifyEmail)
         auth.grouped(AuditLogMiddleware(service: auditLog, event: .emailVerificationResendRequested, endpoint: .resendVerificationEmail)).post("resend-verification-email", use: resendVerificationEmail)
+    }
+
+    @Sendable
+    func introspect(req: Request) async throws -> SessionIntrospectionResponseDTO {
+        let payload = try await AuthSession.payload(from: req)
+        let session = try await AuthSession.validate(payload, on: req.db, request: req)
+        return SessionIntrospectionResponseDTO(
+            active: true,
+            userId: session.$user.id.uuidString,
+            sessionId: try session.requireID().uuidString
+        )
     }
 
     private func validate(email: String, password: String) throws {
