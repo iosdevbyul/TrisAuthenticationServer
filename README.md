@@ -175,6 +175,7 @@ Authorization: Bearer <accessToken>
 | POST | `/auth/login` | Authenticate and issue a session |
 | POST | `/auth/refresh` | Rotate the refresh token and session |
 | GET | `/auth/me` | Return the authenticated user |
+| GET | `/auth/introspect` | Validate an access token and its active session |
 | POST | `/auth/logout` | Revoke the current session |
 | GET | `/auth/sessions` | List your active sessions |
 | DELETE | `/auth/sessions/:sessionID` | Revoke your session by stable management ID |
@@ -199,6 +200,9 @@ Session management requires Bearer authentication. Optional `X-Device-Name` on s
 Management IDs survive refresh while JWT sid still rotates. `createdAt` is the current row creation time,
 `startedAt` is the login start, and `lastRefreshedAt` is the latest successful refresh.
 Existing authentication responses remain unchanged. See [session management](docs/session-management.md) for APIs, cleanup, and deployment details.
+
+Backend services can validate sessions through [session introspection](docs/session-introspection.md).
+Authentication and session persistence remain owned by this server; consumers do not query authentication tables.
 
 ### Session response
 

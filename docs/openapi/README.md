@@ -1,7 +1,7 @@
 # Public API contract baseline
 
 `openapi.json` is the generated, committed OpenAPI 3.0.3 artifact for Roadmap #7.
-It includes all 18 registered operations (17 auth operations and `GET /hello`).
+It includes all 19 registered operations (18 auth operations and `GET /hello`).
 There are no public audit, maintenance, Swagger or OpenAPI-serving routes. Railway
 configuration and production request behavior are unchanged.
 
@@ -29,12 +29,12 @@ Full regression: `swift test --no-parallel`, with the existing disposable
 `waktrainer_test_auth` database and `TEST_DATABASE_*` settings described in the
 root README. Never use a production database. The compiled OpenAPI suite itself
 requires no database. The GitHub workflow runs generation/staleness, specification,
-reference and Python regression checks. Swift build/tests remain local checks;
-the workflow does not provision Swift or PostgreSQL.
+reference and Python regression checks, plus host and package builds/tests with
+Swift 6.3 and a disposable PostgreSQL 16 service.
 
 ## Sources and update policy
 
-- `Sources/TrisAuthenticationServer/DTOs/*.swift`: property types and requiredness.
+- `Packages/AuthenticationServerKit/Sources/AuthenticationServerKit/DTOs/*.swift`: property types and requiredness.
 - `AuthController.swift` / `SessionController.swift`: route, request/response DTO
   and current Bearer checks.
 - `APIError.swift`: complete error-code catalog and default status mapping.
